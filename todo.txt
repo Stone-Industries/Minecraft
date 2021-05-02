@@ -1,0 +1,2 @@
+before final release
+-remove worldedit from clientside

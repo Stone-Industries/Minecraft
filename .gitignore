@@ -1,0 +1,16 @@
+
+world/
+
+crash-reports/
+
+.vscode/
+
+logs/
+
+patchouli_books/
+libraries/
+.mixin.out/
+mods/
+config/worldedit/.archive-unpack/
+
+config/worldedit/sessions/

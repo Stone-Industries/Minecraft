@@ -1,0 +1,1 @@
+This folder is specifically for FTB Ranks and contains rank data that is pressed down by default by the modpack.

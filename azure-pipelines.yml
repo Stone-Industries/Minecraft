@@ -1,0 +1,209 @@
+name: $(Build.DefinitionName)+$(Build.BuildId)
+
+# resources:
+#   pipelines:
+#     - pipeline: serverstarter
+#       branch: master
+#       project: StoneIndustries
+#       source: ServerStarter
+#       trigger:
+#         stages:
+#           - dev
+#     - pipeline: kubejs_alchemistry
+#       branch: master
+#       project: StoneIndustries
+#       source: KubeJS-Alchemistry
+#       trigger:
+#         stages:
+#           - dev
+
+parameters:
+  - name: MinecraftVersion
+    displayName: Minecraft Version
+    type: string
+    default: 1.16.5
+  - name: ModpackVersion
+    displayName: Modpack Version
+    type: string
+    default:
+  - name: ForgeVersion
+    displayName: Forge Version
+    type: string
+    default:
+
+variables:
+  - name: ModpackName
+    value: Stone Industries
+    readonly: true
+  - name: ModpackAuthor
+    value: Stone Industries Team
+    readonly: true
+  - name: ModListPath
+    value: $(Build.SourcesDirectory)\modlist.csv
+    readonly: true
+  - name: OutputLocation
+    value: $(Build.BinariesDirectory)\manifest.json
+    readonly: true
+  - name: GitHubOrg
+    value: Stone-Industries
+    readonly: true
+  - name: GitHubRepo
+    value: Minecraft
+    readonly: true
+  - group: StoneIndustries-Git
+
+trigger: 
+  branches:
+    include:
+      - master
+      - prerelease/*
+  tags:
+    include:
+      - release/*
+
+pool:
+  name: Sandbox Servers Agents
+
+stages:
+  - stage: build
+    displayName: "Build and Package"
+    jobs:
+      - job: build_and_package
+        displayName: "Build and Package"
+        workspace:
+          clean: all
+        steps:
+          - powershell: |
+  
+              #Add PowerShell function to current session that was retrieved from repo
+              . $(Build.SourcesDirectory)\scripts\New-ModpackManifest.ps1
+              
+              #Build manifest file
+              Try{
+                New-ModpackManifest `
+                  -MinecraftVersion ${{ parameters.MinecraftVersion }} `
+                  -ForgeVersion ${{ parameters.ForgeVersion }} `
+                  -ModpackVersion ${{ parameters.ModpackVersion }} `
+                  -ModpackName "$(ModpackName)" `
+                  -ModpackAuthor "$(ModpackAuthor)" `
+                  -ModListPath $(ModListPath) `
+                  -OutputLocation $(OutputLocation)
+              }
+              catch{
+                Write-Error "$PSItem"
+              }
+            failOnStderr: true
+            name: createmanifest
+            displayName: Create Manifest
+          - task: CopyFiles@2
+            displayName: Copy Client Configs
+            name: copyclient
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)\client-config'
+              Contents: |
+                **
+                !readme.md
+              TargetFolder: '$(Build.BinariesDirectory)\overrides\config'
+          - task: CopyFiles@2
+            displayName: Copy Server Configs
+            name: copyserver
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)\server-config'
+              Contents: |
+                **
+                !readme.md
+              TargetFolder: '$(Build.BinariesDirectory)\overrides\config'
+          - task: CopyFiles@2
+            displayName: Copy World Configs
+            name: copyworld
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)\world-config'
+              Contents: |
+                **
+                !readme.md
+              TargetFolder: '$(Build.BinariesDirectory)\overrides\defaultconfigs'
+          - task: CopyFiles@2
+            displayName: Copy KubeJS Files
+            name: copykubejs
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)\kubejs'
+              Contents: |
+                **
+                !readme.md
+              TargetFolder: '$(Build.BinariesDirectory)\overrides\kubejs'
+          - task: ArchiveFiles@2
+            displayName: ZIP Files
+            name: zipfiles
+            inputs:
+              rootFolderOrFile: '$(Build.BinariesDirectory)'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)\modpack-download.zip'
+              replaceExistingArchive: false
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Pipeline Artifact
+            name: publish
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)'
+              artifact: 'modpack-download'
+              publishLocation: 'pipeline'
+  - stage: dev
+    displayName: "Dev"
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      # - deployment: 
+      #   environment: StoneIndustries-Dev
+      #   displayName: "Push to GitHub"
+      #   workspace:
+      #     clean: all
+      #   strategy:
+      #     runOnce:
+      #       deploy:
+      #         steps:
+      #         - checkout: self
+      - deployment: 
+        environment: StoneIndustries-Dev
+        displayName: "Push to GitHub"
+        workspace:
+          clean: all
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - checkout: self
+              - powershell: |
+                  $env:GIT_REDIRECT_STDERR = '2>&1'
+                  $RepoURL = "https://Cadacious:$env:PERSONALACCESSTOKEN@github.com/$(GitHubOrg)/$(GitHubRepo)"
+
+                  Set-Location $(Agent.TempDirectory)
+                  Remove-Item $(Agent.TempDirectory)\$(GitHubRepo) -recurse -force -erroraction silentlycontinue
+
+                  git clone --branch dev $RepoURL
+
+                  Set-Location $(Agent.TempDirectory)\$(GitHubRepo)
+
+                  Copy-Item -Path $(Build.SourcesDirectory)\* -Destination $(Agent.TempDirectory)\$(GitHubRepo)\ -recurse
+
+                  git add --all
+                  git commit -m "Merging to GitHub Dev branch from Azure DevOps"
+                  git push origin dev
+
+                  $env:PERSONALACCESSTOKEN | out-file $(Agent.TempDirectory)\token.txt
+                displayName: 
+                env:
+                  PersonalAccessToken: $(Git-Token)
+
+  - stage: staging
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/prerelease/'))
+    displayName: "Staging"
+    jobs:
+      - deployment: 
+        environment: StoneIndustries-Staging
+        displayName: "Deploy Staging"
+        workspace:
+          clean: all
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - powershell: |
