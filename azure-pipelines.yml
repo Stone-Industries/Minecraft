@@ -399,10 +399,10 @@ stages:
               steps:
               - checkout: self
               - pwsh: |
-                  set GH_TOKEN="%PERSONALACCESSTOKEN%"
-                  set GH_REPO="$(GitHubOrg)/$(GitHubRepo)"
-                  set NO_COLOR="true"
-                  set CLICOLOR="0"
+                  set GH_TOKEN=%PERSONALACCESSTOKEN%
+                  set GH_REPO=$(GitHubOrg)/$(GitHubRepo)
+                  set NO_COLOR=true
+                  set CLICOLOR=0
 
                   gh auth login --with-token
 
