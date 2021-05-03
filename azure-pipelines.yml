@@ -404,7 +404,7 @@ stages:
 
                   gh auth login --with-token
 
-                  gh release create $(ModpackVersion) $(Pipeline.Workspace)\$(Release.PrimaryArtifactSourceAlias)\*.* -n "Hello world of the Stone Industries Minecraft Modpack." -p -t "Stone Industries ($(ModpackVersion))"
+                  gh release create ${{ parameters.ModpackVersion }} $(Pipeline.Workspace)\$(Release.PrimaryArtifactSourceAlias)\*.* -n "Hello world of the Stone Industries Minecraft Modpack." -p -t "Stone Industries (${{ parameters.ModpackVersion }})"
 
                   gh auth logout
                 displayName: 
