@@ -402,9 +402,11 @@ stages:
                   $env:NO_COLOR = "true"
                   $env:CLICOLOR = "0"
 
+                  git config --global user.name "Azure-Pipelines"
+
                   gh auth login --with-token
 
-                  gh release create ${{ parameters.ModpackVersion }} $(Pipeline.Workspace)\$(Release.PrimaryArtifactSourceAlias)\*.* -n "Hello world of the Stone Industries Minecraft Modpack." -p -t "Stone Industries (${{ parameters.ModpackVersion }})"
+                  gh release create ${{ parameters.ModpackVersion }} $(Pipeline.Workspace)\modpack-download\*.* -n "Hello world of the Stone Industries Minecraft Modpack." -p -t "Stone Industries (${{ parameters.ModpackVersion }})"
 
                   gh auth logout
                 displayName: 
