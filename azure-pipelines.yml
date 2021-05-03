@@ -396,7 +396,7 @@ stages:
             deploy:
               steps:
               - checkout: self
-              - powershell: |
+              - pwsh: |
                   $env:GH_TOKEN = "$env:PERSONALACCESSTOKEN"
                   $env:GH_REPO = "$(GitHubOrg)/$(GitHubRepo)"
                   $env:NO_COLOR = "true"
