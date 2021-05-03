@@ -365,7 +365,9 @@ stages:
 
                   Set-Location $(Agent.TempDirectory)
                   Remove-Item $(Agent.TempDirectory)\$(GitHubRepo) -recurse -force -erroraction silentlycontinue
-
+                  git config --global user.name "Azure-Pipelines"
+                  git config --global user.email "Azure-Pipelines@SandboxServers.games"
+                  
                   git clone --branch dev $RepoURL
 
                   Set-Location $(Agent.TempDirectory)\$(GitHubRepo)
@@ -402,13 +404,11 @@ stages:
                   $env:NO_COLOR = "true"
                   $env:CLICOLOR = "0"
 
-                  git config --global user.name "Azure-Pipelines"
+                  gh auth login --with-token 2>&1
 
-                  gh auth login --with-token
+                  gh release create ${{ parameters.ModpackVersion }} $(Pipeline.Workspace)\modpack-download\*.* -n "Hello world of the Stone Industries Minecraft Modpack." -p -t "Stone Industries (${{ parameters.ModpackVersion }})" 2>&1
 
-                  gh release create ${{ parameters.ModpackVersion }} $(Pipeline.Workspace)\modpack-download\*.* -n "Hello world of the Stone Industries Minecraft Modpack." -p -t "Stone Industries (${{ parameters.ModpackVersion }})"
-
-                  gh auth logout
+                  gh auth logout 2>&1
                 displayName: 
                 env:
                   PersonalAccessToken: $(Git-Token)
