@@ -383,7 +383,7 @@ stages:
         variables:
           - group: StoneIndustries-Git
         environment: StoneIndustries-Dev
-        displayName: "Push to GitHub"
+        displayName: "Create GitHub PreRelease"
         workspace:
           clean: all
         strategy:
@@ -392,7 +392,7 @@ stages:
               steps:
               - checkout: self
               - powershell: |
-                  $env:GH_TOKEN = $env:GIT-TOKEN"
+                  $env:GH_TOKEN = "$env:PERSONALACCESSTOKEN"
                   $env:GH_REPO = "$(GitHubOrg)/$(GitHubRepo)"
 
                   gh auth login
