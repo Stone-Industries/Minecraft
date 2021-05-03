@@ -30,6 +30,10 @@ parameters:
     displayName: Forge Version
     type: string
     default:
+  - name: CreatePrerelease
+    displayName: Create Prerelease
+    type: boolean
+    default: false
 
 variables:
   - name: ModpackName
@@ -379,6 +383,7 @@ stages:
                 env:
                   PersonalAccessToken: $(Git-Token)
       - deployment: create_github_prerelease
+        condition: and(succeeded(), eq('${{ parameters.CreatePrerelease }}', true))
         dependsOn: push_to_github_dev
         variables:
           - group: StoneIndustries-Git
@@ -395,7 +400,7 @@ stages:
                   $env:GH_TOKEN = "$env:PERSONALACCESSTOKEN"
                   $env:GH_REPO = "$(GitHubOrg)/$(GitHubRepo)"
 
-                  gh auth login
+                  gh auth login --with-token
 
                   gh release create $(ModpackVersion) $(Pipeline.Workspace)\$(Release.PrimaryArtifactSourceAlias)\*.* -n "Hello world of the Stone Industries Minecraft Modpack." -p -t "Stone Industries ($(ModpackVersion))"
 
