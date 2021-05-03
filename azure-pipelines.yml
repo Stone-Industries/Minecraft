@@ -399,12 +399,11 @@ stages:
               steps:
               - checkout: self
               - pwsh: |
-                  set GH_TOKEN=%PERSONALACCESSTOKEN%
                   set GH_REPO=$(GitHubOrg)/$(GitHubRepo)
                   set NO_COLOR=true
                   set CLICOLOR=0
-
-                  gh auth login --with-token
+                  echo %PERSONALACCESSTOKEN% > $(Agent.TempDirectory)\token.txt
+                  gh auth login --with-token < $(Agent.TempDirectory)\token.txt
 
                   gh release create ${{ parameters.ModpackVersion }} $(Pipeline.Workspace)\modpack-download\*.* -n "Hello world of the Stone Industries Minecraft Modpack." -p -t "Stone Industries (${{ parameters.ModpackVersion }})"
 
