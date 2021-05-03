@@ -30,7 +30,7 @@ Function New-ModpackManifest{
             "minecraft" = @{"version" = "$($MinecraftVersion.ToString())";
                 "modLoaders" = @(
                     [Ordered]@{
-                        "id" = "$($ForgeVersion.ToString())";
+                        "id" = "forge-$($ForgeVersion.ToString())";
                         "primary" = $true
                     }
                 )
@@ -93,10 +93,12 @@ Function New-ModpackManifest{
             else{
                 $FileID = $File.id
             }
-            
+
+            [Int]$ProjectID = $Mod.ProjectID
+
             #Build hashtable containing information about this mod
             $ModInfo = [Ordered]@{
-                    "projectID"= $Mod.ProjectID;
+                    "projectID"= $ProjectID;
                     "fileID"= $FileID;
                     "required"= $true;
             }
@@ -109,6 +111,6 @@ Function New-ModpackManifest{
         $Manifest["files"] = $ModFiles
 
         #Convert manifest to JSON and output to location provided by caller
-        $Manifest | ConvertTo-Json -Depth 99 | Out-File -FilePath $OutputLocation
+        $Manifest | ConvertTo-Json -Depth 99 | Format-Json -Indentation 2 | Out-File -FilePath $OutputLocation
     }
 }

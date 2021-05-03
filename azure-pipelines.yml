@@ -42,7 +42,7 @@ variables:
     value: $(Build.SourcesDirectory)\modlist.csv
     readonly: true
   - name: OutputLocation
-    value: $(Build.BinariesDirectory)\manifest.json
+    value: $(Build.BinariesDirectory)\modpack\manifest.json
     readonly: true
   - name: GitHubOrg
     value: Stone-Industries
@@ -50,7 +50,12 @@ variables:
   - name: GitHubRepo
     value: Minecraft
     readonly: true
-  - group: StoneIndustries-Git
+  - name: PterodactylAddress
+    value: https://pterodactyl.sandboxservers.games
+    readonly: true
+  - name: PterodactylNode
+    value: node2.pterodactyl.sandboxservers.games
+    readonly: true
 
 trigger: 
   branches:
@@ -73,13 +78,17 @@ stages:
         workspace:
           clean: all
         steps:
+
           - powershell: |
   
               #Add PowerShell function to current session that was retrieved from repo
               . $(Build.SourcesDirectory)\scripts\New-ModpackManifest.ps1
-              
+              . $(Build.SourcesDirectory)\scripts\Format-Json.ps1
+
               #Build manifest file
               Try{
+                New-Item -Path $(Build.BinariesDirectory) -Name modpack -ItemType Directory
+                
                 New-ModpackManifest `
                   -MinecraftVersion ${{ parameters.MinecraftVersion }} `
                   -ForgeVersion ${{ parameters.ForgeVersion }} `
@@ -95,6 +104,23 @@ stages:
             failOnStderr: true
             name: createmanifest
             displayName: Create Manifest
+          - powershell: |
+              Set-Location $(Build.SourcesDirectory)
+              $Content = get-content -raw -path $(Build.SourcesDirectory)\scripts\startserver.sh; 
+              $Content -replace "`r`n","`n" | set-content -path $(Build.SourcesDirectory)\scripts\startserver.sh
+              $Content = get-content -raw -path $(Build.BinariesDirectory)\modpack\manifest.json 
+              $Content -replace "`r`n","`n" | set-content -path $(Build.BinariesDirectory)\modpack\manifest.json
+            displayName: "Dos2Unix conversion"
+          - task: CopyFiles@2
+            displayName: Copy Scripts
+            name: copyscripts
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)\scripts'
+              Contents: |
+                startserver.sh
+                server-setup-config.yaml
+                !readme.md
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
           - task: CopyFiles@2
             displayName: Copy Client Configs
             name: copyclient
@@ -103,7 +129,7 @@ stages:
               Contents: |
                 **
                 !readme.md
-              TargetFolder: '$(Build.BinariesDirectory)\overrides\config'
+              TargetFolder: '$(Build.BinariesDirectory)\modpack\overrides\config'
           - task: CopyFiles@2
             displayName: Copy Server Configs
             name: copyserver
@@ -112,7 +138,7 @@ stages:
               Contents: |
                 **
                 !readme.md
-              TargetFolder: '$(Build.BinariesDirectory)\overrides\config'
+              TargetFolder: '$(Build.BinariesDirectory)\modpack\overrides\config'
           - task: CopyFiles@2
             displayName: Copy World Configs
             name: copyworld
@@ -121,7 +147,7 @@ stages:
               Contents: |
                 **
                 !readme.md
-              TargetFolder: '$(Build.BinariesDirectory)\overrides\defaultconfigs'
+              TargetFolder: '$(Build.BinariesDirectory)\modpack\overrides\defaultconfigs'
           - task: CopyFiles@2
             displayName: Copy KubeJS Files
             name: copykubejs
@@ -130,17 +156,18 @@ stages:
               Contents: |
                 **
                 !readme.md
-              TargetFolder: '$(Build.BinariesDirectory)\overrides\kubejs'
+              TargetFolder: '$(Build.BinariesDirectory)\modpack\overrides\kubejs'
           - task: ArchiveFiles@2
             displayName: ZIP Files
             name: zipfiles
             inputs:
-              rootFolderOrFile: '$(Build.BinariesDirectory)'
+              rootFolderOrFile: '$(Build.BinariesDirectory)\modpack'
               includeRootFolder: false
               archiveType: 'zip'
               archiveFile: '$(Build.ArtifactStagingDirectory)\modpack-download.zip'
               replaceExistingArchive: false
           - task: PublishPipelineArtifact@1
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
             displayName: Publish Pipeline Artifact
             name: publish
             inputs:
@@ -151,17 +178,174 @@ stages:
     displayName: "Dev"
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      # - deployment: 
-      #   environment: StoneIndustries-Dev
-      #   displayName: "Push to GitHub"
-      #   workspace:
-      #     clean: all
-      #   strategy:
-      #     runOnce:
-      #       deploy:
-      #         steps:
-      #         - checkout: self
-      - deployment: 
+      - deployment: deploydev
+        variables:
+          - name: ServerID
+            value: 7fea3ead
+          - group: StoneIndustries-Git
+        environment: StoneIndustries-Dev
+        displayName: "Deploy to Dev Instance"
+        workspace:
+          clean: all
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - powershell: |
+                  $Body = @{"signal" = "stop";} | ConvertTo-JSON -Compress
+
+                  $Headers = @{
+                    "authorization"="Bearer $env:PTERODACTYLTOKEN";
+                    "accept"="Application/vnd.pterodactyl.v1+json";
+                    "content-type"="application/json";
+                  }
+
+                  $APIEndpoint = "api/client/servers/$(ServerID)/power"
+
+                  Try{
+                    Write-Host "Invoking server stop via Pterodactyl API"
+
+                    Invoke-RestMethod -Method Post -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers -body "$Body"
+                  }
+                  Catch{
+                    Write-Error $PSItem
+                  }
+
+                  #Give server time to stop
+                  Start-Sleep 10
+
+                  $DesiredState = "Offline"
+                  $StateReached = $false
+                  $i = 1
+                  $MaximumRetries = 5
+                  $PollingInterval = 30
+
+                  $APIEndpoint = "api/client/servers/$(ServerID)/resources"
+
+                  Do{
+                    Write-Host "Testing to see if server instance is $DesiredState. Test $i of $MaximumRetries."
+                    
+                    $REST = Invoke-RestMethod -Method Get -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers
+
+                    If($REST.attributes.current_state -eq "$DesiredState"){
+                      $StateReached = $True
+                    }
+                    else{
+                      $i++
+                      Start-Sleep $PollingInterval
+                    }
+
+                    If($i -eq $MaximumRetries+1){
+                      #Its dev, were only waiting so long.
+                      Write-Error "$(System.StageName) instance did not reached $DesiredState state after $MaximumRetries health checks ($($PollingInterval*$MaximumRetries) seconds)."
+                      $Body = @{"signal" = "kill";} | ConvertTo-JSON -Compress
+
+                      Try{
+                        Invoke-RestMethod -Method Get -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers
+                        $StateReached = $True
+                      }
+                      Catch{
+                        Write-Error "$PSItem"
+                      }
+                    }
+                  }Until($StateReached -eq $True)
+                displayName: "Stop $(System.StageName) server"
+                env:
+                  PterodactylToken: $(Pterodactyl-Token)
+                failOnStderr: true
+                name: stopserver
+              - powershell: |
+                  $Body = @{
+                    "root" = "/";
+                    "files" = @("modpack-download.zip", "serverstarter.lock", "server-setup-config.yaml", "startserver.sh", "manifest.json")
+                  } | ConvertTo-JSON -Compress
+
+                  $Headers = @{
+                    "authorization"="Bearer $env:PTERODACTYLTOKEN";
+                    "accept"="Application/vnd.pterodactyl.v1+json";
+                    "content-type"="application/json";
+                  }
+
+                  $APIEndpoint = "api/client/servers/$(ServerID)/files/delete"
+
+                  Try{
+                    Write-Host "Invoking server stop via Pterodactyl API"
+
+                    Invoke-RestMethod -Method Post -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers -body "$Body"
+                  }
+                  Catch{
+                    Write-Error $PSItem
+                  }
+
+                displayName: "Remove serverlock and modpack files on $(System.StageName) server"
+                env:
+                  PterodactylToken: $(Pterodactyl-Token)
+                failOnStderr: true
+                name: deletefiles
+              - task: CopyFilesOverSSH@0
+                displayName: "Copy files to $(System.StageName)"
+                inputs:
+                  sshEndpoint: 'StoneIndustries-Minecraft-SSH-Dev'
+                  sourceFolder: '$(Pipeline.Workspace)\modpack-download'
+                  contents: '**'
+                  targetFolder: '/'
+                  readyTimeout: '20000'
+                  overwrite: false
+                  failOnEmptySource: true
+              - powershell: |
+                  $Body = @{"signal" = "start";} | ConvertTo-JSON -Compress
+
+                  $Headers = @{
+                    "authorization"="Bearer $env:PTERODACTYLTOKEN";
+                    "accept"="Application/vnd.pterodactyl.v1+json";
+                    "content-type"="application/json";
+                  }
+
+                  $APIEndpoint = "api/client/servers/$(ServerID)/power"
+
+                  Try{
+                    Write-Host "Invoking server start via Pterodactyl API"
+
+                    Invoke-RestMethod -Method Post -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers -Body "$Body"
+                  }
+                  Catch{
+                    Write-Error $PSItem
+                  }
+                  
+                  $DesiredState = "Started"
+                  $StateReached = $false
+                  $i = 1
+                  $MaximumRetries = 10
+                  $PollingInterval = 30
+                  
+                  $APIEndpoint = "api/client/servers/$(ServerID)/resources"
+
+                  Do{
+                    Write-Host "Testing to see if server instance has fully $DesiredState. Test $i of $MaximumRetries."
+                    
+                    $REST = Invoke-RestMethod -Method Get -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers
+
+                    If($REST.attributes.current_state -eq "Running"){
+                      $StateReached = $True
+                    }
+                    else{
+                      $i++
+                      Start-Sleep $PollingInterval
+                    }
+
+                    If($i -eq $MaximumRetries+1){
+                        Write-Error "$(System.StageName) instance did not reached $DesiredState state after $MaximumRetries health checks ($($PollingInterval*$MaximumRetries) seconds)."
+                    }
+                  }Until($StateReached -eq $True)
+                displayName: "Start $(System.StageName) server"
+                env:
+                  PterodactylToken: $(Pterodactyl-Token)
+                failOnStderr: true
+                name: startserver
+      - deployment:
+        dependsOn: deploydev
+        variables:
+          - group: StoneIndustries-Git
         environment: StoneIndustries-Dev
         displayName: "Push to GitHub"
         workspace:
@@ -182,6 +366,8 @@ stages:
 
                   Set-Location $(Agent.TempDirectory)\$(GitHubRepo)
 
+                  Remove-Item $(Agent.TempDirectory)\$(GitHubRepo)\* -Recurse
+
                   Copy-Item -Path $(Build.SourcesDirectory)\* -Destination $(Agent.TempDirectory)\$(GitHubRepo)\ -recurse
 
                   git add --all
@@ -192,7 +378,6 @@ stages:
                 displayName: 
                 env:
                   PersonalAccessToken: $(Git-Token)
-
   - stage: staging
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/prerelease/'))
     displayName: "Staging"
