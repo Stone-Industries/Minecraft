@@ -398,12 +398,13 @@ stages:
             deploy:
               steps:
               - checkout: self
-              - pwsh: |
+              - powershell: |
                   $Body = $Body = [Ordered]@{
                     "tag_name"="${{ parameters.ModpackVersion }}"; 
                     "name"="Stone Industries (${{ parameters.ModpackVersion }}"; 
                     "body"="Hello world of the Stone Industries Minecraft modpack"; 
                     "prerelease"=$true;
+                    "draft"=$true;
                   }
                   Invoke-RestMethod `
                     -Method Post `
