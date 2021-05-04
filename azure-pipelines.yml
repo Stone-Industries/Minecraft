@@ -399,18 +399,18 @@ stages:
               steps:
               - checkout: self
               - powershell: |
-                  $Body = $Body = [Ordered]@{
+                  $Body = [Ordered]@{
                     "tag_name"="${{ parameters.ModpackVersion }}"; 
                     "name"="Stone Industries (${{ parameters.ModpackVersion }}"; 
                     "body"="Hello world of the Stone Industries Minecraft modpack"; 
                     "prerelease"=$true;
                     "draft"=$true;
-                  }
+                  } | convertto-json
                   Invoke-RestMethod `
                     -Method Post `
                     -uri https://api.github.com/repos/stone-industries/minecraft/releases `
                     -Headers @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+jso"} `
-                    -body $body
+                    -body "$body"
                 displayName: ""
                 env:
                   PersonalAccessToken: $(Git-Token)

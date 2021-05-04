@@ -68,6 +68,9 @@ Function New-ModpackManifest{
             If("$($Mod.JarName)" -eq "spark-forge"){
                 $File = $REST.files | Where-Object -FilterScript { ($PSItem.display -eq "$($Mod.Version) (Forge $MinecraftVersion)") }
             }
+            ElseIf("$($Mod.JarName)" -eq "BotanyPots"){
+                $File = $REST.files | Where-Object -FilterScript { ($PSItem.name -eq "$($Mod.JarName)-$($Mod.Version).jar") }
+            }
             else{
                 $File = $REST.files | Where-Object -FilterScript { (($PSItem.name -like "$($Mod.JarName)*") -and ($PSItem.name -like "*$($Mod.Version)*")) }
             }
