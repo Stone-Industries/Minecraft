@@ -1,4 +1,4 @@
-name: $(Build.DefinitionName)+$(Build.BuildId)+$(Rev:r)
+name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)+$(Rev:.r)
 
 # resources:
 #   pipelines:
@@ -98,9 +98,6 @@ stages:
       CreateRelease: ${{ parameters.CreateRelease }}
       ReleaseNotes: ${{ parameters.ReleaseNotes }}
       isProdDeployment: ${{ parameters.isProdDeployment }}
-      DevServerID: $(DevServerID)
-      StagingServerID: $(StagingServerID)
-      ProdServerID: $(ProdServerID)
       SourcesDirectory: $(Build.SourcesDirectory)
       BinariesDirectory: $(Build.BinariesDirectory)
       ArtifactDirectory: $(Build.ArtifactStagingDirectory)

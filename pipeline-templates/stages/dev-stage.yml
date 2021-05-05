@@ -30,12 +30,13 @@ stages:
           PterodactylAddress: ${{ parameters.PterodactylAddress }}
           PipelineWorkspace: ${{ parameters.PipelineWorkspace }}
 
-      - template: ../jobs/push-to-github.yml
+      - template: ../jobs/perform-github-pr.yml
         parameters:
           GitHubOrg: ${{ parameters.GitHubOrg }}
           GitHubRepo: ${{ parameters.GitHubRepo }}
-          SourcesDirectory: ${{ parameters.SourcesDirectory }}
-          TempDirectory: ${{ parameters.TempDirectory }}
+          GitHubSourceBranch: dev
+          GitHubDestinationBranch: staging
+          ModpackVersion: ${{ parameters.ModpackVersion }}
 
       - template: ../jobs/create-github-release.yml
         parameters:

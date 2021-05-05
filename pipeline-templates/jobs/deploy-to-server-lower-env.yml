@@ -7,7 +7,7 @@ parameters:
     default: ''
 
 jobs:
-  - deployment: 
+  - deployment: deployserver
     environment: StoneIndustries-Dev
     displayName: "Deploy to Dev Instance"
     workspace:

@@ -25,7 +25,7 @@ parameters:
   - name: ArtifactDirectory
     default:
 jobs:
-  - job: 
+  - job: buildandpackage
     displayName: "Build and Package ${{ parameters.ManifestType }}"
     workspace:
       clean: all

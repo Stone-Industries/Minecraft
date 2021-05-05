@@ -23,12 +23,6 @@ parameters:
     default: ''
   - name: isProdDeployment
     default: ''
-  - name: DevServerID
-    default: ''
-  - name: StagingServerID
-    default: ''
-  - name: ProdServerID
-    default: ''
   - name: SourcesDirectory
     default: ''
   - name: BinariesDirectory
@@ -39,7 +33,7 @@ parameters:
     default: ''
 
 stages:
-  - template: ../stages/build-stage.yml
+  - template: ../stages/build-client-stage.yml
     parameters:
       MinecraftVersion: ${{ parameters.MinecraftVersion }}
       ModpackVersion: ${{ parameters.ModpackVersion }}
@@ -49,6 +43,20 @@ stages:
       SourcesDirectory: $(Build.SourcesDirectory)
       BinariesDirectory: $(Build.BinariesDirectory)
       ArtifactDirectory: $(Build.ArtifactStagingDirectory)
+  
+  - template: ../stages/build-server-stage.yml
+    parameters:
+      MinecraftVersion: ${{ parameters.MinecraftVersion }}
+      ModpackVersion: ${{ parameters.ModpackVersion }}
+      ForgeVersion: ${{ parameters.ForgeVersion }}
+      ModpackName: ${{ parameters.ModpackName }}
+      ModpackAuthor: ${{ parameters.ModpackAuthor }}
+      GitHubOrg: ${{ parameters.GitHubOrg }}
+      GitHubRepo: ${{ parameters.GitHubRepo }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      BinariesDirectory: $(Build.BinariesDirectory)
+      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
+      TempDirectory: $(Agent.TempDirectory)
 
   - template: ../stages/dev-stage.yml
     parameters:

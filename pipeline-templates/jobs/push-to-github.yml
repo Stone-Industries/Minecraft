@@ -9,7 +9,8 @@ parameters:
     default: ''
 
 jobs:
-  - deployment: 
+  - deployment: pushtogit
+    dependsOn: buildandpackage
     environment: StoneIndustries-Dev
     displayName: "Push to GitHub"
     workspace:
@@ -37,7 +38,7 @@ jobs:
               Copy-Item -Path ${{ parameters.SourcesDirectory }}\* -Destination ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }}\ -recurse
 
               git add --all
-              git commit -m "Merging to GitHub Dev branch from Azure DevOps"
+              git commit -m "Merging to GitHub Dev branch from Azure DevOps after successful build"
               git push origin dev
 
               $env:PERSONALACCESSTOKEN | out-file ${{ parameters.TempDirectory }}\token.txt

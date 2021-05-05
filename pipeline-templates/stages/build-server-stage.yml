@@ -9,16 +9,21 @@ parameters:
     default: ''
   - name: ForgeVersion
     default: ''
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
   - name: SourcesDirectory
     default:
   - name: BinariesDirectory
     default:
   - name: ArtifactDirectory
     default:
-
+  - name: TempDirectory
+    default:
 stages:
-  - stage: build
-    displayName: "Build and Package"
+  - stage: build_server
+    displayName: "Build and Package Server"
     jobs:
     - template: ../jobs/build-and-package.yml
       parameters:
@@ -34,16 +39,9 @@ stages:
         BinariesDirectory: ${{ parameters.BinariesDirectory }}
         ArtifactDirectory: ${{ parameters.ArtifactDirectory }}
 
-    - template: ../jobs/build-and-package.yml
+    - template: ../jobs/push-to-github.yml
       parameters:
-        MinecraftVersion: ${{ parameters.MinecraftVersion }}
-        ModpackVersion: ${{ parameters.ModpackVersion }}
-        ForgeVersion: ${{ parameters.ForgeVersion }}
-        ModpackName: ${{ parameters.ModpackName }}
-        ModpackAuthor: ${{ parameters.ModpackAuthor }}
-        ModListPath: ${{ parameters.SourcesDirectory }}\modlist-client.csv
-        ManifestType: client
-        OutputLocation: ${{ parameters.BinariesDirectory }}\client
+        GitHubOrg: ${{ parameters.GitHubOrg }}
+        GitHubRepo: ${{ parameters.GitHubRepo }}
         SourcesDirectory: ${{ parameters.SourcesDirectory }}
-        BinariesDirectory: ${{ parameters.BinariesDirectory }}
-        ArtifactDirectory: ${{ parameters.ArtifactDirectory }}
+        TempDirectory: ${{ parameters.TempDirectory }}
