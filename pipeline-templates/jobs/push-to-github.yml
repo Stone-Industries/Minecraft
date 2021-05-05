@@ -1,0 +1,46 @@
+parameters:
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: SourcesDirectory
+    default: ''
+  - name: TempDirectory
+    default: ''
+
+jobs:
+  - deployment: 
+    environment: StoneIndustries-Dev
+    displayName: "Push to GitHub"
+    workspace:
+      clean: all
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - powershell: |
+              $env:GIT_REDIRECT_STDERR = '2>&1'
+              $RepoURL = "https://Cadacious:$env:PERSONALACCESSTOKEN@github.com/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}"
+
+              Set-Location ${{ parameters.TempDirectory }}
+              Remove-Item ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }} -recurse -force -erroraction silentlycontinue
+              git config --global user.name "Azure-Pipelines"
+              git config --global user.email "Azure-Pipelines@SandboxServers.games"
+              
+              git clone --branch dev $RepoURL
+
+              Set-Location ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }}
+
+              Remove-Item ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }}\* -Recurse
+
+              Copy-Item -Path ${{ parameters.SourcesDirectory }}\* -Destination ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }}\ -recurse
+
+              git add --all
+              git commit -m "Merging to GitHub Dev branch from Azure DevOps"
+              git push origin dev
+
+              $env:PERSONALACCESSTOKEN | out-file ${{ parameters.TempDirectory }}\token.txt
+            displayName: 
+            env:
+              PersonalAccessToken: $(Git-Token)

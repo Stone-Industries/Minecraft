@@ -1,4 +1,4 @@
-name: $(Build.DefinitionName)+$(Build.BuildId)
+name: $(Build.DefinitionName)+$(Build.BuildId)+$(Rev:r)
 
 # resources:
 #   pipelines:
@@ -22,44 +22,42 @@ parameters:
     displayName: Minecraft Version
     type: string
     default: 1.16.5
+  - name: ModpackName
+    displayName: Modpack Name
+    type: string
+    default: Stone Industries
+  - name: ModpackAuthor
+    displayName: Modpack Author
+    type: string
+    default: Stone Industries Team
   - name: ModpackVersion
     displayName: Modpack Version
     type: string
-    default:
+    default: 0.0.2
   - name: ForgeVersion
     displayName: Forge Version
     type: string
-    default:
+    default: 36.1.2
+  - name: ReleaseNotes
+    displayName: Release Notes
+    type: string
+    default: ''
+  - name: GitHubOrg
+    displayName: GitHub Organization
+    type: string
+    default: 'Stone-Industries'
+  - name: GitHubRepo
+    displayName: GitHub Repo
+    type: string
+    default: 'Minecraft'
+  - name: PterodactylAddress
+    displayName: Pterodactyl Address
+    type: string
+    default: 'https://pterodactyl.sandboxservers.games'
   - name: CreatePrerelease
     displayName: Create Prerelease
     type: boolean
     default: false
-
-variables:
-  - name: ModpackName
-    value: Stone Industries
-    readonly: true
-  - name: ModpackAuthor
-    value: Stone Industries Team
-    readonly: true
-  - name: ModListPath
-    value: $(Build.SourcesDirectory)\modlist.csv
-    readonly: true
-  - name: OutputLocation
-    value: $(Build.BinariesDirectory)\modpack\manifest.json
-    readonly: true
-  - name: GitHubOrg
-    value: Stone-Industries
-    readonly: true
-  - name: GitHubRepo
-    value: Minecraft
-    readonly: true
-  - name: PterodactylAddress
-    value: https://pterodactyl.sandboxservers.games
-    readonly: true
-  - name: PterodactylNode
-    value: node2.pterodactyl.sandboxservers.games
-    readonly: true
 
 trigger: 
   branches:
@@ -74,357 +72,54 @@ pool:
   name: Sandbox Servers Agents
 
 stages:
-  - stage: build
-    displayName: "Build and Package"
-    jobs:
-      - job: build_and_package
-        displayName: "Build and Package"
-        workspace:
-          clean: all
-        steps:
+  - template: pipeline-templates/stages/build-stage.yml
+    parameters:
+        MinecraftVersion: ${{ parameters.MinecraftVersion }}
+        ModpackVersion: ${{ parameters.ModpackVersion }}
+        ForgeVersion: ${{ parameters.ForgeVersion }}
+        ModpackName: ${{ parameters.ModpackName }}
+        ModpackAuthor: ${{ parameters.ModpackAuthor }}
+        SourcesDirectory: $(Build.SourcesDirectory)
+        BinariesDirectory: $(Build.BinariesDirectory)
+        ArtifactDirectory: $(Build.ArtifactStagingDirectory)
 
-          - powershell: |
-  
-              #Add PowerShell function to current session that was retrieved from repo
-              . $(Build.SourcesDirectory)\scripts\New-ModpackManifest.ps1
-              . $(Build.SourcesDirectory)\scripts\Format-Json.ps1
-
-              #Build manifest file
-              Try{
-                New-Item -Path $(Build.BinariesDirectory) -Name modpack -ItemType Directory
-                
-                New-ModpackManifest `
-                  -MinecraftVersion ${{ parameters.MinecraftVersion }} `
-                  -ForgeVersion ${{ parameters.ForgeVersion }} `
-                  -ModpackVersion ${{ parameters.ModpackVersion }} `
-                  -ModpackName "$(ModpackName)" `
-                  -ModpackAuthor "$(ModpackAuthor)" `
-                  -ModListPath $(ModListPath) `
-                  -OutputLocation $(OutputLocation)
-              }
-              catch{
-                Write-Error "$PSItem"
-              }
-            failOnStderr: true
-            name: createmanifest
-            displayName: Create Manifest
-          - powershell: |
-              Set-Location $(Build.SourcesDirectory)
-              $Content = get-content -raw -path $(Build.SourcesDirectory)\scripts\startserver.sh; 
-              $Content -replace "`r`n","`n" | set-content -path $(Build.SourcesDirectory)\scripts\startserver.sh
-              $Content = get-content -raw -path $(Build.BinariesDirectory)\modpack\manifest.json 
-              $Content -replace "`r`n","`n" | set-content -path $(Build.BinariesDirectory)\modpack\manifest.json
-            displayName: "Dos2Unix conversion"
-          - task: CopyFiles@2
-            displayName: Copy Scripts
-            name: copyscripts
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)\scripts'
-              Contents: |
-                startserver.sh
-                server-setup-config.yaml
-                !readme.md
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
-          - task: CopyFiles@2
-            displayName: Copy Client Configs
-            name: copyclient
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)\client-config'
-              Contents: |
-                **
-                !readme.md
-              TargetFolder: '$(Build.BinariesDirectory)\modpack\overrides\config'
-          - task: CopyFiles@2
-            displayName: Copy Server Configs
-            name: copyserver
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)\server-config'
-              Contents: |
-                **
-                !readme.md
-              TargetFolder: '$(Build.BinariesDirectory)\modpack\overrides\config'
-          - task: CopyFiles@2
-            displayName: Copy World Configs
-            name: copyworld
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)\world-config'
-              Contents: |
-                **
-                !readme.md
-              TargetFolder: '$(Build.BinariesDirectory)\modpack\overrides\defaultconfigs'
-          - task: CopyFiles@2
-            displayName: Copy KubeJS Files
-            name: copykubejs
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)\kubejs'
-              Contents: |
-                **
-                !readme.md
-              TargetFolder: '$(Build.BinariesDirectory)\modpack\overrides\kubejs'
-          - task: ArchiveFiles@2
-            displayName: ZIP Files
-            name: zipfiles
-            inputs:
-              rootFolderOrFile: '$(Build.BinariesDirectory)\modpack'
-              includeRootFolder: false
-              archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)\modpack-download.zip'
-              replaceExistingArchive: false
-          - task: PublishPipelineArtifact@1
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-            displayName: Publish Pipeline Artifact
-            name: publish
-            inputs:
-              targetPath: '$(Build.ArtifactStagingDirectory)'
-              artifact: 'modpack-download'
-              publishLocation: 'pipeline'
   - stage: dev
     displayName: "Dev"
+    variables:
+      - group: StoneIndustries-Git
+      - group: StoneIndustries-Modpack-Dev
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      - deployment: deploydev
-        variables:
-          - name: ServerID
-            value: 7fea3ead
-          - group: StoneIndustries-Git
-        environment: StoneIndustries-Dev
-        displayName: "Deploy to Dev Instance"
-        workspace:
-          clean: all
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - powershell: |
-                  $Body = @{"signal" = "stop";} | ConvertTo-JSON -Compress
+      - template: pipeline-templates/jobs/deploy-to-server-lower-env.yml
+        parameters:
+          ServerID: $(ServerID)
+          PterodactylAddress: ${{ parameters.PterodactylAddress }}
+          PipelineWorkspace: $(Pipeline.Workspace)
 
-                  $Headers = @{
-                    "authorization"="Bearer $env:PTERODACTYLTOKEN";
-                    "accept"="Application/vnd.pterodactyl.v1+json";
-                    "content-type"="application/json";
-                  }
+      - template: pipeline-templates/jobs/push-to-github.yml
+        parameters:
+          GitHubOrg: ${{ parameters.GitHubOrg }}
+          GitHubRepo: ${{ parameters.GitHubRepo }}
+          SourcesDirectory: $(Build.SourcesDirectory)
+          TempDirectory: $(Agent.TempDirectory)
 
-                  $APIEndpoint = "api/client/servers/$(ServerID)/power"
+      - template: pipeline-templates/jobs/create-github-prerelease.yml
+        parameters:
+          GitHubOrg: ${{ parameters.GitHubOrg }}
+          GitHubRepo: ${{ parameters.GitHubRepo }}
+          ModpackVersion: ${{ parameters.ModpackVersion }}
+          CreatePrerelease: ${{ parameters.CreatePrerelease }}
+          ReleaseNotes: ${{ parameters.ReleaseNotes }}
 
-                  Try{
-                    Write-Host "Invoking server stop via Pterodactyl API"
-
-                    Invoke-RestMethod -Method Post -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers -body "$Body"
-                  }
-                  Catch{
-                    Write-Error $PSItem
-                  }
-
-                  #Give server time to stop
-                  Start-Sleep 10
-
-                  $DesiredState = "Offline"
-                  $StateReached = $false
-                  $i = 1
-                  $MaximumRetries = 5
-                  $PollingInterval = 30
-
-                  $APIEndpoint = "api/client/servers/$(ServerID)/resources"
-
-                  Do{
-                    Write-Host "Testing to see if server instance is $DesiredState. Test $i of $MaximumRetries."
-                    
-                    $REST = Invoke-RestMethod -Method Get -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers
-
-                    If($REST.attributes.current_state -eq "$DesiredState"){
-                      $StateReached = $True
-                    }
-                    else{
-                      $i++
-                      Start-Sleep $PollingInterval
-                    }
-
-                    If($i -eq $MaximumRetries+1){
-                      #Its dev, were only waiting so long.
-                      Write-Error "$(System.StageName) instance did not reached $DesiredState state after $MaximumRetries health checks ($($PollingInterval*$MaximumRetries) seconds)."
-                      $Body = @{"signal" = "kill";} | ConvertTo-JSON -Compress
-
-                      Try{
-                        Invoke-RestMethod -Method Get -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers
-                        $StateReached = $True
-                      }
-                      Catch{
-                        Write-Error "$PSItem"
-                      }
-                    }
-                  }Until($StateReached -eq $True)
-                displayName: "Stop $(System.StageName) server"
-                env:
-                  PterodactylToken: $(Pterodactyl-Token)
-                failOnStderr: true
-                name: stopserver
-              - powershell: |
-                  $Body = @{
-                    "root" = "/";
-                    "files" = @("modpack-download.zip", "serverstarter.lock", "server-setup-config.yaml", "startserver.sh", "manifest.json")
-                  } | ConvertTo-JSON -Compress
-
-                  $Headers = @{
-                    "authorization"="Bearer $env:PTERODACTYLTOKEN";
-                    "accept"="Application/vnd.pterodactyl.v1+json";
-                    "content-type"="application/json";
-                  }
-
-                  $APIEndpoint = "api/client/servers/$(ServerID)/files/delete"
-
-                  Try{
-                    Write-Host "Invoking server stop via Pterodactyl API"
-
-                    Invoke-RestMethod -Method Post -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers -body "$Body"
-                  }
-                  Catch{
-                    Write-Error $PSItem
-                  }
-
-                displayName: "Remove serverlock and modpack files on $(System.StageName) server"
-                env:
-                  PterodactylToken: $(Pterodactyl-Token)
-                failOnStderr: true
-                name: deletefiles
-              - task: CopyFilesOverSSH@0
-                displayName: "Copy files to $(System.StageName)"
-                inputs:
-                  sshEndpoint: 'StoneIndustries-Minecraft-SSH-Dev'
-                  sourceFolder: '$(Pipeline.Workspace)\modpack-download'
-                  contents: '**'
-                  targetFolder: '/'
-                  readyTimeout: '20000'
-                  overwrite: false
-                  failOnEmptySource: true
-              - powershell: |
-                  $Body = @{"signal" = "start";} | ConvertTo-JSON -Compress
-
-                  $Headers = @{
-                    "authorization"="Bearer $env:PTERODACTYLTOKEN";
-                    "accept"="Application/vnd.pterodactyl.v1+json";
-                    "content-type"="application/json";
-                  }
-
-                  $APIEndpoint = "api/client/servers/$(ServerID)/power"
-
-                  Try{
-                    Write-Host "Invoking server start via Pterodactyl API"
-
-                    Invoke-RestMethod -Method Post -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers -Body "$Body"
-                  }
-                  Catch{
-                    Write-Error $PSItem
-                  }
-                  
-                  $DesiredState = "Started"
-                  $StateReached = $false
-                  $i = 1
-                  $MaximumRetries = 10
-                  $PollingInterval = 30
-                  
-                  $APIEndpoint = "api/client/servers/$(ServerID)/resources"
-
-                  Do{
-                    Write-Host "Testing to see if server instance has fully $DesiredState. Test $i of $MaximumRetries."
-                    
-                    $REST = Invoke-RestMethod -Method Get -Uri "$(PterodactylAddress)/$APIEndpoint" -Headers $Headers
-
-                    If($REST.attributes.current_state -eq "Running"){
-                      $StateReached = $True
-                    }
-                    else{
-                      $i++
-                      Start-Sleep $PollingInterval
-                    }
-
-                    If($i -eq $MaximumRetries+1){
-                        Write-Error "$(System.StageName) instance did not reached $DesiredState state after $MaximumRetries health checks ($($PollingInterval*$MaximumRetries) seconds)."
-                    }
-                  }Until($StateReached -eq $True)
-                displayName: "Start $(System.StageName) server"
-                env:
-                  PterodactylToken: $(Pterodactyl-Token)
-                failOnStderr: true
-                name: startserver
-      - deployment: push_to_github_dev
-        dependsOn: deploydev
-        variables:
-          - group: StoneIndustries-Git
-        environment: StoneIndustries-Dev
-        displayName: "Push to GitHub"
-        workspace:
-          clean: all
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - checkout: self
-              - powershell: |
-                  $env:GIT_REDIRECT_STDERR = '2>&1'
-                  $RepoURL = "https://Cadacious:$env:PERSONALACCESSTOKEN@github.com/$(GitHubOrg)/$(GitHubRepo)"
-
-                  Set-Location $(Agent.TempDirectory)
-                  Remove-Item $(Agent.TempDirectory)\$(GitHubRepo) -recurse -force -erroraction silentlycontinue
-                  git config --global user.name "Azure-Pipelines"
-                  git config --global user.email "Azure-Pipelines@SandboxServers.games"
-                  
-                  git clone --branch dev $RepoURL
-
-                  Set-Location $(Agent.TempDirectory)\$(GitHubRepo)
-
-                  Remove-Item $(Agent.TempDirectory)\$(GitHubRepo)\* -Recurse
-
-                  Copy-Item -Path $(Build.SourcesDirectory)\* -Destination $(Agent.TempDirectory)\$(GitHubRepo)\ -recurse
-
-                  git add --all
-                  git commit -m "Merging to GitHub Dev branch from Azure DevOps"
-                  git push origin dev
-
-                  $env:PERSONALACCESSTOKEN | out-file $(Agent.TempDirectory)\token.txt
-                displayName: 
-                env:
-                  PersonalAccessToken: $(Git-Token)
-      - deployment: create_github_prerelease
-        condition: and(succeeded(), eq('${{ parameters.CreatePrerelease }}', true))
-        dependsOn: push_to_github_dev
-        variables:
-          - group: StoneIndustries-Git
-        environment: StoneIndustries-Dev
-        displayName: "Create GitHub PreRelease"
-        workspace:
-          clean: all
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - checkout: self
-              - powershell: |
-                  $Body = [Ordered]@{
-                    "tag_name"="${{ parameters.ModpackVersion }}"; 
-                    "name"="Stone Industries (${{ parameters.ModpackVersion }}"; 
-                    "body"="Hello world of the Stone Industries Minecraft modpack"; 
-                    "prerelease"=$true;
-                    "draft"=$true;
-                  } | convertto-json
-                  Invoke-RestMethod `
-                    -Method Post `
-                    -uri https://api.github.com/repos/stone-industries/minecraft/releases `
-                    -Headers @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+jso"} `
-                    -body "$body"
-                displayName: ""
-                env:
-                  PersonalAccessToken: $(Git-Token)
   - stage: staging
+    variables:  
+      - group: StoneIndustries-Git
+      - group: StoneIndustries-Modpack-Staging
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/prerelease/'))
     displayName: "Staging"
     jobs:
-      - deployment: 
-        environment: StoneIndustries-Staging
-        displayName: "Deploy Staging"
-        workspace:
-          clean: all
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - powershell: |
+      - template: pipeline-templates/jobs/deploy-to-server-lower-env.yml
+        parameters:
+          ServerID: $(ServerID)
+          PterodactylAddress: ${{ parameters.PterodactylAddress }}
+          PipelineWorkspace: $(Pipeline.Workspace)

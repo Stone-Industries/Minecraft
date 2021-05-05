@@ -1,4 +1,6 @@
 function Format-Json {
+    #Found this in a very helpful stackoverflow answer, all credit to the original author Theo.
+    #https://stackoverflow.com/a/56324939
     <#
     .SYNOPSIS
         Prettifies JSON output.
