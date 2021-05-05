@@ -1,0 +1,84 @@
+parameters:
+  - name: MinecraftVersion
+    default: ''
+  - name: ModpackName
+    default: ''
+  - name: ModpackAuthor
+    default: ''
+  - name: ModpackVersion
+    default: ''
+  - name: ForgeVersion
+    default: ''
+  - name: ReleaseNotes
+    default: ''
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: PterodactylAddress
+    default: ''
+  - name: CreatePrerelease
+    default: ''
+  - name: CreateRelease
+    default: ''
+  - name: isProdDeployment
+    default: ''
+  - name: DevServerID
+    default: ''
+  - name: StagingServerID
+    default: ''
+  - name: ProdServerID
+    default: ''
+  - name: SourcesDirectory
+    default: ''
+  - name: BinariesDirectory
+    default: ''
+  - name: ArtifactDirectory
+    default: ''
+  - name: PipelineWorkspace
+    default: ''
+
+stages:
+  - template: ../stages/build-stage.yml
+    parameters:
+      MinecraftVersion: ${{ parameters.MinecraftVersion }}
+      ModpackVersion: ${{ parameters.ModpackVersion }}
+      ForgeVersion: ${{ parameters.ForgeVersion }}
+      ModpackName: ${{ parameters.ModpackName }}
+      ModpackAuthor: ${{ parameters.ModpackAuthor }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      BinariesDirectory: $(Build.BinariesDirectory)
+      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
+
+  - template: ../stages/dev-stage.yml
+    parameters:
+      ServerID: $(DevServerID)
+      PterodactylAddress: ${{ parameters.PterodactylAddress }}
+      PipelineWorkspace: $(Pipeline.Workspace)
+      GitHubOrg: ${{ parameters.GitHubOrg }}
+      GitHubRepo: ${{ parameters.GitHubRepo }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      TempDirectory: $(Agent.TempDirectory)
+      ModpackVersion: ${{ parameters.ModpackVersion }}
+      CreatePrerelease: ${{ parameters.CreatePrerelease }}
+      ReleaseNotes: ${{ parameters.ReleaseNotes }}
+
+  - template: ../stages/staging-stage.yml
+    parameters:
+      ServerID: $(StagingServerID)
+      PterodactylAddress: ${{ parameters.PterodactylAddress }}
+      PipelineWorkspace: $(Pipeline.Workspace)
+      GitHubOrg: ${{ parameters.GitHubOrg }}
+      GitHubRepo: ${{ parameters.GitHubRepo }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      TempDirectory: $(Agent.TempDirectory)
+      ModpackVersion: ${{ parameters.ModpackVersion }}
+      CreateRelease: ${{ parameters.CreateRelease }}
+      ReleaseNotes: ${{ parameters.ReleaseNotes }}
+
+  - template: ../stages/prod-stage.yml
+    parameters:
+      ServerID: $(ProdServerID)
+      PterodactylAddress: ${{ parameters.PterodactylAddress }}
+      PipelineWorkspace: $(Pipeline.Workspace)
+      isProdDeployment: ${{ parameters.isProdDeployment }}

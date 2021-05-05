@@ -58,6 +58,18 @@ parameters:
     displayName: Create Prerelease
     type: boolean
     default: false
+  - name: CreateRelease
+    displayName: Create Release
+    type: boolean
+    default: false
+  - name: isProdDeployment
+    displayName: Deploy To Prod
+    type: boolean
+    default: false
+
+variables:
+ - group: StoneIndustries-Modpack
+ - group: StoneIndustries-Git
 
 trigger: 
   branches:
@@ -72,54 +84,24 @@ pool:
   name: Sandbox Servers Agents
 
 stages:
-  - template: pipeline-templates/stages/build-stage.yml
+  - template: pipeline-templates/pipelines/modpack-pipeline.yml
     parameters:
-        MinecraftVersion: ${{ parameters.MinecraftVersion }}
-        ModpackVersion: ${{ parameters.ModpackVersion }}
-        ForgeVersion: ${{ parameters.ForgeVersion }}
-        ModpackName: ${{ parameters.ModpackName }}
-        ModpackAuthor: ${{ parameters.ModpackAuthor }}
-        SourcesDirectory: $(Build.SourcesDirectory)
-        BinariesDirectory: $(Build.BinariesDirectory)
-        ArtifactDirectory: $(Build.ArtifactStagingDirectory)
-
-  - stage: dev
-    displayName: "Dev"
-    variables:
-      - group: StoneIndustries-Git
-      - group: StoneIndustries-Modpack-Dev
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    jobs:
-      - template: pipeline-templates/jobs/deploy-to-server-lower-env.yml
-        parameters:
-          ServerID: $(ServerID)
-          PterodactylAddress: ${{ parameters.PterodactylAddress }}
-          PipelineWorkspace: $(Pipeline.Workspace)
-
-      - template: pipeline-templates/jobs/push-to-github.yml
-        parameters:
-          GitHubOrg: ${{ parameters.GitHubOrg }}
-          GitHubRepo: ${{ parameters.GitHubRepo }}
-          SourcesDirectory: $(Build.SourcesDirectory)
-          TempDirectory: $(Agent.TempDirectory)
-
-      - template: pipeline-templates/jobs/create-github-prerelease.yml
-        parameters:
-          GitHubOrg: ${{ parameters.GitHubOrg }}
-          GitHubRepo: ${{ parameters.GitHubRepo }}
-          ModpackVersion: ${{ parameters.ModpackVersion }}
-          CreatePrerelease: ${{ parameters.CreatePrerelease }}
-          ReleaseNotes: ${{ parameters.ReleaseNotes }}
-
-  - stage: staging
-    variables:  
-      - group: StoneIndustries-Git
-      - group: StoneIndustries-Modpack-Staging
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/prerelease/'))
-    displayName: "Staging"
-    jobs:
-      - template: pipeline-templates/jobs/deploy-to-server-lower-env.yml
-        parameters:
-          ServerID: $(ServerID)
-          PterodactylAddress: ${{ parameters.PterodactylAddress }}
-          PipelineWorkspace: $(Pipeline.Workspace)
+      MinecraftVersion: ${{ parameters.MinecraftVersion }}
+      ModpackVersion: ${{ parameters.ModpackVersion }}
+      ForgeVersion: ${{ parameters.ForgeVersion }}
+      ModpackName: ${{ parameters.ModpackName }}
+      ModpackAuthor: ${{ parameters.ModpackAuthor }}
+      PterodactylAddress: ${{ parameters.PterodactylAddress }}
+      GitHubOrg: ${{ parameters.GitHubOrg }}
+      GitHubRepo: ${{ parameters.GitHubRepo }}
+      CreatePrerelease: ${{ parameters.CreatePrerelease }}
+      CreateRelease: ${{ parameters.CreateRelease }}
+      ReleaseNotes: ${{ parameters.ReleaseNotes }}
+      isProdDeployment: ${{ parameters.isProdDeployment }}
+      DevServerID: $(DevServerID)
+      StagingServerID: $(StagingServerID)
+      ProdServerID: $(ProdServerID)
+      SourcesDirectory: $(Build.SourcesDirectory)
+      BinariesDirectory: $(Build.BinariesDirectory)
+      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
+      PipelineWorkspace: $(Pipeline.Workspace)

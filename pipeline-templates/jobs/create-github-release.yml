@@ -7,11 +7,28 @@ parameters:
     default: ''
   - name: CreatePrerelease
     default: ''
+  - name: CreateRelease
+    default: ''
   - name: ReleaseNotes
     default: ''
 jobs:
   - deployment:
-    condition: and(succeeded(), eq('${{ parameters.CreatePrerelease }}', true))
+    condition: |
+      or(
+        and(
+          succeeded(), 
+          eq(
+            '${{ parameters.CreatePrerelease }}', true
+          )
+        )
+        ,
+        and(
+          succeeded(), 
+          eq(
+            '${{ parameters.CreateRelease }}', true
+          )
+        )
+      )
     environment: StoneIndustries-Dev
     displayName: "Create GitHub PreRelease"
     workspace:
@@ -22,12 +39,12 @@ jobs:
               steps:
               - powershell: |
                   $Token = $env:PERSONALACCESSTOKEN
-                  
+                  If({{ parameters.CreatePrerelease }})
                   $Body = [Ordered]@{
                   "tag_name"="${{ parameters.ModpackVersion }}"; 
                   "name"="Stone Industries (${{ parameters.ModpackVersion }}"; 
                   "body"="${{ parameters.ReleaseNotes }}"; 
-                  "prerelease"=$true;
+                  "prerelease"=$prerelease;
                   "draft"=$true;
                   } | convertto-json
                   

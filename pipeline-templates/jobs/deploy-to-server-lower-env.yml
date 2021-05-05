@@ -101,7 +101,7 @@ jobs:
             displayName: "Copy files to $(System.StageName)"
             inputs:
               sshEndpoint: 'StoneIndustries-Minecraft-SSH-Dev'
-              sourceFolder: '${{ parameters.PipelineWorkspace }}\modpack-download'
+              sourceFolder: '${{ parameters.PipelineWorkspace }}\server-modpack-download'
               contents: '**'
               targetFolder: '/'
               readyTimeout: '20000'
