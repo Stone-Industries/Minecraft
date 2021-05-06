@@ -10,6 +10,7 @@ parameters:
 
 jobs:
   - deployment: pushtogit
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     dependsOn: buildandpackage
     environment: StoneIndustries-Dev
     displayName: "Push to GitHub"
