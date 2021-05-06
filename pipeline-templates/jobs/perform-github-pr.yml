@@ -45,10 +45,7 @@ jobs:
                   $Token = $env:PERSONALACCESSTOKEN
 
                   $Body = [Ordered]@{
-                  "commit_title"="Completing PR";
                   "commit_message"="Completing PR to ${{ parameters.GitHubDestinationBranch }} branch via Azure Pipelines"
-                  "sha"="$env:PRSHA"
-                  "merge_method"="squash"
                   } | convertto-json
 
                   $Headers = @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+json"}
