@@ -51,7 +51,7 @@ jobs:
                     action: 'create'
                     target: '${{ parameters.ModpackVersion }}'
                     tagSource: 'userSpecifiedTag'
-                    tag: '${{ parameters.GitHubSourceBranch }}'
+                    tag: 'v${{ parameters.ModpackVersion }}'
                     title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
                     releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
                     assets: |
@@ -69,7 +69,7 @@ jobs:
                     action: 'create'
                     target: '${{ parameters.ModpackVersion }}'
                     tagSource: 'userSpecifiedTag'
-                    tag: '${{ parameters.ModpackVersion }}'
+                    tag: 'v${{ parameters.ModpackVersion }}'
                     title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
                     releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
                     assets: |
