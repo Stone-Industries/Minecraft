@@ -9,11 +9,11 @@ parameters:
 jobs:
   - deployment: deployserver
     environment: StoneIndustries-${{ variables.System.StageName }}
-    ${{ if eq('${{ Variables.System.StageName }}', 'dev') }}:
+    ${{ if eq('${{ Variables."System.StageName" }}', 'dev') }}:
       displayName: "Deploy to Dev Instance"
-    ${{ if eq('${{ Variables.System.StageName }}', 'staging') }}:
+    ${{ if eq('${{ Variables."System.StageName" }}', 'staging') }}:
       displayName: "Deploy to Staging Instance"
-    ${{ if eq('${{ Variables.System.StageName }}', 'prod') }}:
+    ${{ if eq('${{ Variables."System.StageName" }}', 'prod') }}:
       displayName: "Deploy to Prod Instance"
     workspace:
       clean: all
@@ -77,7 +77,7 @@ jobs:
           - powershell: |
               $Body = @{
                 "root" = "/";
-                "files" = @("modpack-download.zip", "serverstarter.lock", "server-setup-config.yaml", "startserver.sh", "manifest.json")
+                "files" = @("modpack-download-server.zip", "serverstarter.lock", "server-setup-config.yaml", "startserver.sh", "manifest.json")
               } | ConvertTo-JSON -Compress
 
               $Headers = @{
