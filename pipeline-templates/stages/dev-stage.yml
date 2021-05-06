@@ -46,5 +46,6 @@ stages:
           ModpackName: ${{ parameters.ModpackName }}
           GitHubOrg: ${{ parameters.GitHubOrg }}
           GitHubRepo: ${{ parameters.GitHubRepo }}
+          GitHubSourceBranch: dev
           CreatePrerelease: ${{ parameters.CreatePrerelease }}
           ReleaseNotes: ${{ parameters.ReleaseNotes }}

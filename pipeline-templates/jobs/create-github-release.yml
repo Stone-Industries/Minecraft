@@ -7,6 +7,8 @@ parameters:
     default: ''
   - name: GitHubRepo
     default: ''
+  - name: GitHubSourceBranch
+    default: ''
   - name: CreatePrerelease
     default: false
   - name: CreateRelease
@@ -31,7 +33,7 @@ jobs:
           )
         )
       )
-    environment: StoneIndustries-Dev
+    environment: StoneIndustries-${{ Variables.System.StageName }}
     workspace:
         clean: all
     strategy:
@@ -49,7 +51,7 @@ jobs:
                     action: 'create'
                     target: '${{ parameters.ModpackVersion }}'
                     tagSource: 'userSpecifiedTag'
-                    tag: '${{ parameters.ModpackVersion }}-preview'
+                    tag: '${{ parameters.GitHubSourceBranch }}'
                     title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
                     releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
                     assets: |
