@@ -12,7 +12,7 @@ jobs:
   - deployment: pushtogit
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     dependsOn: buildandpackage
-    environment: StoneIndustries-Dev
+    environment: StoneIndustries-${{ variables.System.StageName }}
     displayName: "Push to GitHub"
     workspace:
       clean: all

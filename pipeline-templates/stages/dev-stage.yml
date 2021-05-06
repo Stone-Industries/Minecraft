@@ -1,6 +1,8 @@
 parameters:
   - name: ModpackVersion
     default: ''
+  - name: ModpackName
+    default: ''
   - name: ServerID
     default: ''
   - name: PterodactylAddress
@@ -12,13 +14,13 @@ parameters:
   - name: GitHubRepo
     default: ''
   - name: CreatePrerelease
-    default:
+    default: false
   - name: ReleaseNotes
-    default:
+    default: ''
   - name: SourcesDirectory
-    default:
+    default: ''
   - name: TempDirectory
-    default:
+    default: ''
 stages:
   - stage: dev
     displayName: "Dev"
@@ -40,8 +42,9 @@ stages:
 
       - template: ../jobs/create-github-release.yml
         parameters:
+          ModpackVersion: ${{ parameters.ModpackVersion }}
+          ModpackName: ${{ parameters.ModpackName }}
           GitHubOrg: ${{ parameters.GitHubOrg }}
           GitHubRepo: ${{ parameters.GitHubRepo }}
-          ModpackVersion: ${{ parameters.ModpackVersion }}
           CreatePrerelease: ${{ parameters.CreatePrerelease }}
           ReleaseNotes: ${{ parameters.ReleaseNotes }}

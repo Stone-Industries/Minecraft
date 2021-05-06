@@ -18,11 +18,11 @@ parameters:
   - name: PterodactylAddress
     default: ''
   - name: CreatePrerelease
-    default: ''
+    default: false
   - name: CreateRelease
-    default: ''
+    default: false
   - name: isProdDeployment
-    default: ''
+    default: false
   - name: SourcesDirectory
     default: ''
   - name: BinariesDirectory
@@ -60,6 +60,8 @@ stages:
 
   - template: ../stages/dev-stage.yml
     parameters:
+      ModpackVersion: ${{ parameters.ModpackVersion }}
+      ModpackName: ${{ parameters.ModpackName }}
       ServerID: $(DevServerID)
       PterodactylAddress: ${{ parameters.PterodactylAddress }}
       PipelineWorkspace: $(Pipeline.Workspace)
@@ -67,12 +69,13 @@ stages:
       GitHubRepo: ${{ parameters.GitHubRepo }}
       SourcesDirectory: $(Build.SourcesDirectory)
       TempDirectory: $(Agent.TempDirectory)
-      ModpackVersion: ${{ parameters.ModpackVersion }}
       CreatePrerelease: ${{ parameters.CreatePrerelease }}
       ReleaseNotes: ${{ parameters.ReleaseNotes }}
 
   - template: ../stages/staging-stage.yml
     parameters:
+      ModpackVersion: ${{ parameters.ModpackVersion }}
+      ModpackName: ${{ parameters.ModpackName }}
       ServerID: $(StagingServerID)
       PterodactylAddress: ${{ parameters.PterodactylAddress }}
       PipelineWorkspace: $(Pipeline.Workspace)
@@ -80,7 +83,6 @@ stages:
       GitHubRepo: ${{ parameters.GitHubRepo }}
       SourcesDirectory: $(Build.SourcesDirectory)
       TempDirectory: $(Agent.TempDirectory)
-      ModpackVersion: ${{ parameters.ModpackVersion }}
       CreateRelease: ${{ parameters.CreateRelease }}
       ReleaseNotes: ${{ parameters.ReleaseNotes }}
 

@@ -1,6 +1,8 @@
 parameters:
   - name: ModpackVersion
     default: ''
+  - name: ModpackName
+    default: ''
   - name: ServerID
     default: ''
   - name: PterodactylAddress
@@ -42,8 +44,9 @@ stages:
 
       - template: ../jobs/create-github-release.yml
         parameters:
+          ModpackVersion: ${{ parameters.ModpackVersion }}
+          ModpackName: ${{ parameters.ModpackName }}
           GitHubOrg: ${{ parameters.GitHubOrg }}
           GitHubRepo: ${{ parameters.GitHubRepo }}
-          ModpackVersion: ${{ parameters.ModpackVersion }}
           CreateRelease: ${{ parameters.CreateRelease }}
           ReleaseNotes: ${{ parameters.ReleaseNotes }}

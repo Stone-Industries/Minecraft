@@ -1,4 +1,5 @@
-name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)+$(Rev:.r)
+
+name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
 
 # resources:
 #   pipelines:
@@ -6,13 +7,6 @@ name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)+$(Rev:.r)
 #       branch: master
 #       project: StoneIndustries
 #       source: ServerStarter
-#       trigger:
-#         stages:
-#           - dev
-#     - pipeline: kubejs_alchemistry
-#       branch: master
-#       project: StoneIndustries
-#       source: KubeJS-Alchemistry
 #       trigger:
 #         stages:
 #           - dev
@@ -76,9 +70,10 @@ trigger:
     include:
       - master
       - prerelease/*
+      - release/*
   tags:
     include:
-      - release/*
+      - prerelease/*
 
 pool:
   name: Sandbox Servers Agents
