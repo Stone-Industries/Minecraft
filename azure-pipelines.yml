@@ -1,3 +1,4 @@
+
 name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
 
 # resources:
@@ -73,7 +74,6 @@ trigger:
   tags:
     include:
       - prerelease/*
-      - release/*
 
 pool:
   name: Sandbox Servers Agents

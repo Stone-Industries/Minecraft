@@ -32,6 +32,7 @@ jobs:
         )
       )
     environment: StoneIndustries-Dev
+
     ${{ if eq('${{ parameters.CreatePrerelease }}', true) }}:
       displayName: "Create GitHub PreRelease"
     ${{ if eq('${{ parameters.CreateRelease }}', true) }}:
