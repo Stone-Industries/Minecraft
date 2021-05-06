@@ -25,7 +25,7 @@ jobs:
                 inputs:
                   repoType: 'GitHub'
                   githubEndpoint: 'github.com_Cadacious'
-                  githubRepository: 'Minecraft'
+                  githubRepository: 'Stone-Industries/Minecraft'
                   sourceBranch: '${{ parameters.GitHubSourceBranch }}'
                   targetBranch: '${{ parameters.GitHubDestinationBranch }}'
                   title: 'Stone Industries (${{ parameters.ModpackVersion }})'

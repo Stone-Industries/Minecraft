@@ -32,9 +32,9 @@ jobs:
         )
       )
     environment: StoneIndustries-Dev
-    ${{ if eq('${{ parameters.CreatePrerelease }}', 'true') }}:
+    ${{ if eq('${{ parameters.CreatePrerelease }}', true) }}:
       displayName: "Create GitHub PreRelease"
-    ${{ if eq('${{ parameters.CreateRelease }}', 'true') }}:
+    ${{ if eq('${{ parameters.CreateRelease }}', true) }}:
       displayName: "Create GitHub Release"
     workspace:
         clean: all
@@ -48,7 +48,7 @@ jobs:
                   condition: and(succeeded(), eq(${{ parameters.CreatePrerelease }}, 'true'))
                   inputs:
                     gitHubConnection: 'github.com_Cadacious'
-                    repositoryName: '$(Build.Repository.Name)'
+                    repositoryName: 'Stone-Industries/Minecraft'
                     action: 'create'
                     target: '$(Build.SourceVersion)'
                     tagSource: 'userSpecifiedTag'
@@ -63,7 +63,7 @@ jobs:
                   condition: and(succeeded(), eq(${{ parameters.CreateRelease }}, 'true'))
                   inputs:
                     gitHubConnection: 'github.com_Cadacious'
-                    repositoryName: '$(Build.Repository.Name)'
+                    repositoryName: 'Stone-Industries/Minecraft'
                     action: 'create'
                     target: '$(Build.SourceVersion)'
                     tagSource: 'userSpecifiedTag'

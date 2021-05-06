@@ -1,4 +1,4 @@
-name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)+$(Rev:.r)
+name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
 
 # resources:
 #   pipelines:
