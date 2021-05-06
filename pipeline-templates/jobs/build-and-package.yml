@@ -67,17 +67,6 @@ jobs:
       displayName: "Dos2Unix conversion"
 
     - task: CopyFiles@2
-      displayName: Copy Scripts
-      name: copyscripts
-      inputs:
-        SourceFolder: '${{ parameters.SourcesDirectory }}\scripts'
-        Contents: |
-          startserver.sh
-          server-setup-config.yaml
-          !readme.md
-        TargetFolder: '${{ parameters.ArtifactDirectory }}'
-
-    - task: CopyFiles@2
       displayName: Copy Client Configs
       name: copyclient
       inputs:

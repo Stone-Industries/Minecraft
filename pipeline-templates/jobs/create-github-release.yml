@@ -1,14 +1,16 @@
 parameters:
+  - name: ModpackVersion
+    default: ''
+  - name: ModpackName
+    default: ''
   - name: GitHubOrg
     default: ''
   - name: GitHubRepo
     default: ''
-  - name: ModpackVersion
-    default: ''
   - name: CreatePrerelease
-    default: ''
+    default: false
   - name: CreateRelease
-    default: ''
+    default: false
   - name: ReleaseNotes
     default: ''
 jobs:
@@ -37,24 +39,34 @@ jobs:
         runOnce:
           deploy:
               steps:
-              - powershell: |
-                  $Token = $env:PERSONALACCESSTOKEN
-                  $Body = [Ordered]@{
-                    "tag_name"="${{ parameters.ModpackVersion }}";
-                    "name"="Stone Industries (${{ parameters.ModpackVersion }}";
-                    "body"="${{ parameters.ReleaseNotes }}";
-                    "prerelease"=$prerelease;
-                    "draft"=$false;
-                  } 
-
-                  If({{ parameters.CreatePrerelease }}){
-                    $Body["draft"] = $true
-                  }
-
-                  $Headers = @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+json"}
-                  $URI = "https://api.github.com/repos/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}/releases"
-
-                  Invoke-RestMethod -Method Post -uri $URI -Headers $Headers -body "$($Body | ConvertTo-JSON)"
-                displayName: "Create Prerelease via REST API"
-                env:
-                    PersonalAccessToken: $(Git-Token)
+                - task: GitHubRelease@1
+                  displayName: "Create Github Release"
+                  name: githubprerelease
+                  condition: and(succeeded(), eq(${{ parameters.CreatePrerelease }}, 'true'))
+                  inputs:
+                    gitHubConnection: 'github.com_Cadacious'
+                    repositoryName: '$(Build.Repository.Name)'
+                    action: 'create'
+                    target: '$(Build.SourceVersion)'
+                    tagSource: 'userSpecifiedTag'
+                    tag: '${{ parameters.ModpackVersion }}-preview'
+                    title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
+                    releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}'
+                    isPreRelease: true
+                    addChangeLog: false
+                - task: GitHubRelease@1
+                  displayName: "Create Github Release"
+                  name: githubrelease
+                  condition: and(succeeded(), eq(${{ parameters.CreateRelease }}, 'true'))
+                  inputs:
+                    gitHubConnection: 'github.com_Cadacious'
+                    repositoryName: '$(Build.Repository.Name)'
+                    action: 'create'
+                    target: '$(Build.SourceVersion)'
+                    tagSource: 'userSpecifiedTag'
+                    tag: '${{ parameters.ModpackVersion }}'
+                    title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
+                    releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}'
+                    isPreRelease: false
+                    changeLogCompareToRelease: 'lastFullRelease'
+                    changeLogType: 'commitBased'

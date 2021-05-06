@@ -20,40 +20,29 @@ jobs:
         runOnce:
           deploy:
               steps:
-              - powershell: |
-                  $Token = $env:PERSONALACCESSTOKEN
-                  
-                  $Body = [Ordered]@{
-                  "title"="Stone Industries (${{ parameters.ModpackVersion }})"; 
-                  "head"="${{ parameters.GitHubSourceBranch }}";
-                  "base"="${{ parameters.GitHubDestinationBranch }}";
-                  "body"="Opening Pull Request to ${{ parameters.GitHubDestinationBranch }} branch after successful deployment to ${{ parameters.GitHubDestinationBranch }} server.";
-                  "maintainer_can_modify"=$true;
-                  "draft"=$false;
-                  } | convertto-json
-
-                  $Headers = @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+json"}
-                  $URI = "https://api.github.com/repos/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}/pulls"
-
-                  Invoke-RestMethod -Method Post -uri $URI -Headers $Headers -body "$body" | Tee-Object -Variable REST
-                  Write-Host "##vso[task.setvariable variable=prnumber]$($REST.number)"
-                  Write-Host "##vso[task.setvariable variable=prsha]$($REST.head.sha)"
-                displayName: "Create Pull Request via REST API"
-                env:
-                    PersonalAccessToken: $(Git-Token)
+              - task: CreatePullRequest@1
+                displayName: "Create Pull Request"
+                inputs:
+                  repoType: 'GitHub'
+                  githubEndpoint: 'github.com_Cadacious'
+                  githubRepository: 'Minecraft'
+                  sourceBranch: '${{ parameters.GitHubSourceBranch }}'
+                  targetBranch: '${{ parameters.GitHubDestinationBranch }}'
+                  title: 'Stone Industries (${{ parameters.ModpackVersion }})'
+                  description: 'Opening Pull Request via Azure Pipelines to ${{ parameters.GitHubDestinationBranch }} branch after successful deployment to ${{ parameters.GitHubDestinationBranch }} server.'
+                  passPullRequestIdBackToADO: true
               - powershell: |
                   $Token = $env:PERSONALACCESSTOKEN
 
                   $Body = [Ordered]@{
                   "commit_message"="Completing PR to ${{ parameters.GitHubDestinationBranch }} branch via Azure Pipelines"
-                  "sha"="$env:PRSHA"
                   "merge_method"="squash"
                   } | convertto-json
 
                   $Headers = @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+json"}
-                  $URI = "https://api.github.com/repos/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}/pulls/$env:PRNUMBER/merge"
+                  $URI = "https://api.github.com/repos/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}/pulls/$(pullRequestId)/merge"
 
                   Invoke-RestMethod -Method Put -uri $URI -Headers $Headers -body "$body" | Tee-Object -Variable REST
-                displayName: "Merge Pull Request via REST API"
+                displayName: "Merge Pull Request"
                 env:
                     PersonalAccessToken: $(Git-Token)
