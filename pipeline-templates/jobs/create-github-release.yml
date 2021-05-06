@@ -54,7 +54,7 @@ jobs:
                     tagSource: 'userSpecifiedTag'
                     tag: '${{ parameters.ModpackVersion }}-preview'
                     title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
-                    releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}'
+                    releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
                     isPreRelease: true
                     addChangeLog: false
                 - task: GitHubRelease@1
