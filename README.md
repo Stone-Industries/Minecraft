@@ -1,7 +1,4 @@
-
-[[_TOC_]]
-
-# **Stone Industries**
+**Stone Industries**
 This Minecraft modpack is being put together by the team at [Stone Industries](https://discord.gg/VrgmsNJUmq). Please join us on our discord server to learn more!
 
 # **Project Status**
@@ -12,11 +9,11 @@ View our work in progress on Azure Boards:
 
 **Epics**:
 
-[![Board Status](https://dev.azure.com/SandboxServers/ccebe52c-6200-4e49-ae18-5217b565db46/838ef962-f749-478b-b2ab-61f86f3765b3/_apis/work/boardbadge/d5cf8915-7453-4511-8b98-6794d39867bf?columnOptions=1)](https://dev.azure.com/SandboxServers/ccebe52c-6200-4e49-ae18-5217b565db46/_boards/board/t/838ef962-f749-478b-b2ab-61f86f3765b3/Microsoft.EpicCategory/)
+[![Epic Status](https://dev.azure.com/SandboxServers/ccebe52c-6200-4e49-ae18-5217b565db46/838ef962-f749-478b-b2ab-61f86f3765b3/_apis/work/boardbadge/d5cf8915-7453-4511-8b98-6794d39867bf?columnOptions=1)](https://dev.azure.com/SandboxServers/ccebe52c-6200-4e49-ae18-5217b565db46/_boards/board/t/838ef962-f749-478b-b2ab-61f86f3765b3/Microsoft.EpicCategory/)
 
 **Features**:
 
-[![Board Status](https://dev.azure.com/SandboxServers/ccebe52c-6200-4e49-ae18-5217b565db46/838ef962-f749-478b-b2ab-61f86f3765b3/_apis/work/boardbadge/58f8074a-5b9c-4d0e-bac0-ed4b19a7669c?columnOptions=1)](https://dev.azure.com/SandboxServers/ccebe52c-6200-4e49-ae18-5217b565db46/_boards/board/t/838ef962-f749-478b-b2ab-61f86f3765b3/Microsoft.FeatureCategory/)
+[![Feature Status](https://dev.azure.com/SandboxServers/ccebe52c-6200-4e49-ae18-5217b565db46/838ef962-f749-478b-b2ab-61f86f3765b3/_apis/work/boardbadge/58f8074a-5b9c-4d0e-bac0-ed4b19a7669c?columnOptions=1)](https://dev.azure.com/SandboxServers/ccebe52c-6200-4e49-ae18-5217b565db46/_boards/board/t/838ef962-f749-478b-b2ab-61f86f3765b3/Microsoft.FeatureCategory/)
 
 **User Stories**:
 
@@ -139,4 +136,3 @@ We welcome suggestions for mods. Please file a GitHub issue with a link to the m
 - Rhino
 - Shutupexperimentalsettings
 - Yung's API
-=======

@@ -36,7 +36,7 @@ jobs:
 
                   $Body = [Ordered]@{
                   "commit_message"="Completing PR to ${{ parameters.GitHubDestinationBranch }} branch via Azure Pipelines"
-                  "merge_method"="squash"
+                  "merge_method"="merge"
                   } | convertto-json
 
                   $Headers = @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+json"}
