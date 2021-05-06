@@ -9,13 +9,6 @@ name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)+$(Rev:.r)
 #       trigger:
 #         stages:
 #           - dev
-#     - pipeline: kubejs_alchemistry
-#       branch: master
-#       project: StoneIndustries
-#       source: KubeJS-Alchemistry
-#       trigger:
-#         stages:
-#           - dev
 
 parameters:
   - name: MinecraftVersion
@@ -76,8 +69,10 @@ trigger:
     include:
       - master
       - prerelease/*
+      - release/*
   tags:
     include:
+      - prerelease/*
       - release/*
 
 pool:

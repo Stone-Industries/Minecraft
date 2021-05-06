@@ -67,6 +67,18 @@ jobs:
       displayName: "Dos2Unix conversion"
 
     - task: CopyFiles@2
+      condition: eq(succeeded(),eq('${{ parameters.ManifestType }}','server'))
+      displayName: Copy Scripts
+      name: copyscripts
+      inputs:
+        SourceFolder: '${{ parameters.SourcesDirectory }}\scripts'
+        Contents: |
+            startserver.sh
+            server-setup-config.yaml
+            !readme.md
+        TargetFolder: '${{ parameters.ArtifactDirectory }}'
+
+    - task: CopyFiles@2
       displayName: Copy Client Configs
       name: copyclient
       inputs:
@@ -113,7 +125,7 @@ jobs:
         rootFolderOrFile: '${{ parameters.OutputLocation}}'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '${{ parameters.ArtifactDirectory }}\modpack-download.zip'
+        archiveFile: '${{ parameters.ArtifactDirectory }}\modpack-download-${{ parameters.ManifestType }}.zip'
         replaceExistingArchive: false
 
     - task: PublishPipelineArtifact@1
