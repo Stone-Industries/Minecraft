@@ -43,19 +43,17 @@ jobs:
                     PersonalAccessToken: $(Git-Token)
               - powershell: |
                   $Token = $env:PERSONALACCESSTOKEN
-                  Write-Host "PRNumber: $env:PRNUMBER"
-                  Write-Host "SHA: $env:PRSHA"
+
                   $Body = [Ordered]@{
-                  "pull_number"=$env:PRNUMBER; 
                   "commit_title"="Completing PR";
                   "commit_message"="Completing PR to ${{ parameters.GitHubDestinationBranch }} branch via Azure Pipelines"
                   "sha"="$env:PRSHA"
                   "merge_method"="squash"
                   } | convertto-json
-                  Write-Host $Body
+
                   $Headers = @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+json"}
                   $URI = "https://api.github.com/repos/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}/pulls/$env:PRNUMBER/merge"
-                  Write-Host $URI
+
                   Invoke-RestMethod -Method Post -uri $URI -Headers $Headers -body "$body" | Tee-Object -Variable REST
                 displayName: "Merge Pull Request via REST API"
                 env:
