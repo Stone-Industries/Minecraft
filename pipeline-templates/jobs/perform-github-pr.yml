@@ -13,7 +13,7 @@ jobs:
   - deployment: performpr
     dependsOn: deployserver
     environment: StoneIndustries-Dev
-    displayName: "Perform GitHub Pull Request"
+    displayName: "Pull Request to ${{ parameters.GitHubDestinationBranch }}"
     workspace:
         clean: all
     strategy:

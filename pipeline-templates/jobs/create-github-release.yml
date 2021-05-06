@@ -32,7 +32,10 @@ jobs:
         )
       )
     environment: StoneIndustries-Dev
-    displayName: "Create GitHub PreRelease"
+    ${{ if eq('${{ parameters.CreatePrerelease }}', 'true') }}:
+      displayName: "Create GitHub PreRelease"
+    ${{ if eq('${{ parameters.CreateRelease }}', 'true') }}:
+      displayName: "Create GitHub Release"
     workspace:
         clean: all
     strategy:
@@ -40,7 +43,7 @@ jobs:
           deploy:
               steps:
                 - task: GitHubRelease@1
-                  displayName: "Create Github Release"
+                  displayName: "Create Github Prerelease"
                   name: githubprerelease
                   condition: and(succeeded(), eq(${{ parameters.CreatePrerelease }}, 'true'))
                   inputs:
