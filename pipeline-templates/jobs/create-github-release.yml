@@ -32,16 +32,13 @@ jobs:
         )
       )
     environment: StoneIndustries-Dev
-    ${{ if eq('${{ parameters.CreatePrerelease }}', true) }}:
-      displayName: "Create GitHub PreRelease"
-    ${{ if eq('${{ parameters.CreateRelease }}', true) }}:
-      displayName: "Create GitHub Release"
     workspace:
         clean: all
     strategy:
         runOnce:
           deploy:
               steps:
+                - checkout: self
                 - task: GitHubRelease@1
                   displayName: "Create Github Prerelease"
                   name: githubprerelease
@@ -55,6 +52,9 @@ jobs:
                     tag: '${{ parameters.ModpackVersion }}-preview'
                     title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
                     releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
+                    assets: |
+                      $(Pipeline.Workspace)/server-modpack-download/*
+                      $(Pipeline.Workspace)/client-modpack-download/*
                     isPreRelease: true
                     addChangeLog: false
                 - task: GitHubRelease@1
@@ -69,7 +69,10 @@ jobs:
                     tagSource: 'userSpecifiedTag'
                     tag: '${{ parameters.ModpackVersion }}'
                     title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
-                    releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}'
+                    releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
+                    assets: |
+                      $(Pipeline.Workspace)/server-modpack-download/*
+                      $(Pipeline.Workspace)/client-modpack-download/*
                     isPreRelease: false
                     changeLogCompareToRelease: 'lastFullRelease'
                     changeLogType: 'commitBased'
