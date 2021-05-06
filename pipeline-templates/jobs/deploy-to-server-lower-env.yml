@@ -8,13 +8,8 @@ parameters:
 
 jobs:
   - deployment: deployserver
-    environment: StoneIndustries-${{ variables.System.StageName }}
-    ${{ if eq('${{ variables["System.StageName"] }}', 'dev') }}:
-      displayName: "Deploy to Dev Instance"
-    ${{ if eq('${{ variables["System.StageName"] }}', 'staging') }}:
-      displayName: "Deploy to Staging Instance"
-    ${{ if eq('${{ variables["System.StageName"] }}', 'prod') }}:
-      displayName: "Deploy to Prod Instance"
+    environment: StoneIndustries-${{ Variables.System.StageName }}
+    displayName: "Deploy to ${{ Variables.System.StageName }} Instance"
     workspace:
       clean: all
     strategy:
