@@ -36,8 +36,8 @@ jobs:
                   $URI = "https://api.github.com/repos/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}/pulls"
 
                   Invoke-RestMethod -Method Post -uri $URI -Headers $Headers -body "$body" | Tee-Object -Variable REST
-                  Write-Host "##vso[task.setvariable variable=prnumber]$REST.number"
-                  Write-Host "##vso[task.setvariable variable=prsha]$REST.head.sha"
+                  Write-Host "##vso[task.setvariable variable=prnumber]$($REST.number)"
+                  Write-Host "##vso[task.setvariable variable=prsha]$($REST.head.sha)"
                 displayName: "Create Pull Request via REST API"
                 env:
                     PersonalAccessToken: $(Git-Token)
