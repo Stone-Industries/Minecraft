@@ -1,0 +1,1 @@
+This folder contains configuration files that are loaded into the /world/ folder at creation.

@@ -1,0 +1,137 @@
+parameters:
+  - name: MinecraftVersion
+    default:
+  - name: ModpackVersion
+    default:
+  - name: ForgeVersion
+    default:
+  - name: ModpackName
+    default:
+  - name: ModpackAuthor
+    default:
+  - name: ModListPath
+    default:
+  - name: ManifestType
+    default: server
+    values:
+      - client
+      - server
+  - name: OutputLocation
+    default:
+  - name: SourcesDirectory
+    default:
+  - name: BinariesDirectory
+    default:
+  - name: ArtifactDirectory
+    default:
+jobs:
+  - job: buildandpackage
+    displayName: "Build and Package ${{ parameters.ManifestType }}"
+    workspace:
+      clean: all
+    steps:
+
+    - powershell: |
+        $OutputLocation = "${{ parameters.OutputLocation}}\manifest.json"
+
+        #Add PowerShell function to current session that was retrieved from repo
+        . ${{ parameters.SourcesDirectory }}\scripts\New-ModpackManifest.ps1
+        . ${{ parameters.SourcesDirectory }}\scripts\Format-Json.ps1
+
+        #Build manifest file
+        Try{
+        New-Item -Path ${{ parameters.BinariesDirectory}} -Name ${{ parameters.ManifestType}} -ItemType Directory
+
+        New-ModpackManifest `
+            -MinecraftVersion ${{ parameters.MinecraftVersion }} `
+            -ForgeVersion ${{ parameters.ForgeVersion }} `
+            -ModpackVersion ${{ parameters.ModpackVersion }} `
+            -ModpackName "${{ parameters.ModpackName }}" `
+            -ModpackAuthor "${{ parameters.ModpackAuthor }}" `
+            -ModListPath ${{ parameters.ModListPath }} `
+            -OutputLocation $OutputLocation
+        }
+        catch{
+        Write-Error "$PSItem"
+        }
+      failOnStderr: true
+      name: createmanifest
+      displayName: Create ${{ parameters.ManifestType}} Manifest
+
+    - powershell: |
+        Set-Location ${{ parameters.SourcesDirectory }}
+        $Content = get-content -raw -path ${{ parameters.SourcesDirectory }}\scripts\startserver.sh; 
+        $Content -replace "`r`n","`n" | set-content -path ${{ parameters.SourcesDirectory }}\scripts\startserver.sh
+        $Content = get-content -raw -path ${{ parameters.OutputLocation}}\manifest.json 
+        $Content -replace "`r`n","`n" | set-content -path ${{ parameters.OutputLocation }}\manifest.json
+      displayName: "Dos2Unix conversion"
+
+    - task: CopyFiles@2
+      displayName: Copy Scripts
+      name: copyscripts
+      inputs:
+        SourceFolder: '${{ parameters.SourcesDirectory }}\scripts'
+        Contents: |
+          startserver.sh
+          server-setup-config.yaml
+          !readme.md
+        TargetFolder: '${{ parameters.ArtifactDirectory }}'
+
+    - task: CopyFiles@2
+      displayName: Copy Client Configs
+      name: copyclient
+      inputs:
+        SourceFolder: '${{ parameters.SourcesDirectory }}\client-config'
+        Contents: |
+          **
+          !readme.md
+        TargetFolder: '${{ parameters.OutputLocation}}\overrides\config'
+
+    - task: CopyFiles@2
+      displayName: Copy Server Configs
+      name: copyserver
+      inputs:
+        SourceFolder: '${{ parameters.SourcesDirectory }}\server-config'
+        Contents: |
+            **
+            !readme.md
+        TargetFolder: '${{ parameters.OutputLocation}}\overrides\config'
+
+    - task: CopyFiles@2
+      displayName: Copy World Configs
+      name: copyworld
+      inputs:
+        SourceFolder: '${{ parameters.SourcesDirectory }}\world-config'
+        Contents: |
+          **
+          !readme.md
+        TargetFolder: '${{ parameters.OutputLocation}}\overrides\defaultconfigs'
+
+    - task: CopyFiles@2
+      displayName: Copy KubeJS Files
+      name: copykubejs
+      inputs:
+        SourceFolder: '${{ parameters.SourcesDirectory }}\kubejs'
+        Contents: |
+            **
+            !readme.md
+        TargetFolder: '${{ parameters.OutputLocation}}\overrides\kubejs'
+
+    - task: ArchiveFiles@2
+      displayName: ZIP Files
+      name: zipfiles
+      inputs:
+        rootFolderOrFile: '${{ parameters.OutputLocation}}'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '${{ parameters.ArtifactDirectory }}\modpack-download.zip'
+        replaceExistingArchive: false
+
+    - task: PublishPipelineArtifact@1
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      displayName: Publish Pipeline Artifact
+      name: publish
+      inputs:
+          targetPath: '${{ parameters.ArtifactDirectory }}'
+          artifact: '${{ parameters.ManifestType}}-modpack-download'
+          publishLocation: 'pipeline'

@@ -1,0 +1,39 @@
+parameters:
+  - name: MinecraftVersion
+    default: ''
+  - name: ModpackName
+    default: ''
+  - name: ModpackAuthor
+    default: ''
+  - name: ModpackVersion
+    default: ''
+  - name: ForgeVersion
+    default: ''
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: SourcesDirectory
+    default:
+  - name: BinariesDirectory
+    default:
+  - name: ArtifactDirectory
+    default:
+
+stages:
+  - stage: build_client
+    displayName: "Build and Package Client"
+    jobs:
+    - template: ../jobs/build-and-package.yml
+      parameters:
+        MinecraftVersion: ${{ parameters.MinecraftVersion }}
+        ModpackVersion: ${{ parameters.ModpackVersion }}
+        ForgeVersion: ${{ parameters.ForgeVersion }}
+        ModpackName: ${{ parameters.ModpackName }}
+        ModpackAuthor: ${{ parameters.ModpackAuthor }}
+        ModListPath: ${{ parameters.SourcesDirectory }}\modlist-client.csv
+        ManifestType: client
+        OutputLocation: ${{ parameters.BinariesDirectory }}\client
+        SourcesDirectory: ${{ parameters.SourcesDirectory }}
+        BinariesDirectory: ${{ parameters.BinariesDirectory }}
+        ArtifactDirectory: ${{ parameters.ArtifactDirectory }}

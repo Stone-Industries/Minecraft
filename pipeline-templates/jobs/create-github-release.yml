@@ -1,0 +1,60 @@
+parameters:
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: ModpackVersion
+    default: ''
+  - name: CreatePrerelease
+    default: ''
+  - name: CreateRelease
+    default: ''
+  - name: ReleaseNotes
+    default: ''
+jobs:
+  - deployment: createrelease
+    dependsOn: performpr
+    condition: |
+      or(
+        and(
+          succeeded(), 
+          eq(
+            '${{ parameters.CreatePrerelease }}', true
+          )
+        ),
+        and(
+          succeeded(), 
+          eq(
+            '${{ parameters.CreateRelease }}', true
+          )
+        )
+      )
+    environment: StoneIndustries-Dev
+    displayName: "Create GitHub PreRelease"
+    workspace:
+        clean: all
+    strategy:
+        runOnce:
+          deploy:
+              steps:
+              - powershell: |
+                  $Token = $env:PERSONALACCESSTOKEN
+                  $Body = [Ordered]@{
+                    "tag_name"="${{ parameters.ModpackVersion }}";
+                    "name"="Stone Industries (${{ parameters.ModpackVersion }}";
+                    "body"="${{ parameters.ReleaseNotes }}";
+                    "prerelease"=$prerelease;
+                    "draft"=$false;
+                  } 
+
+                  If({{ parameters.CreatePrerelease }}){
+                    $Body["draft"] = $true
+                  }
+
+                  $Headers = @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+json"}
+                  $URI = "https://api.github.com/repos/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}/releases"
+
+                  Invoke-RestMethod -Method Post -uri $URI -Headers $Headers -body "$($Body | ConvertTo-JSON)"
+                displayName: "Create Prerelease via REST API"
+                env:
+                    PersonalAccessToken: $(Git-Token)
