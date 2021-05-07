@@ -15,6 +15,8 @@ parameters:
     default: false
   - name: ReleaseNotes
     default: ''
+  - name: TempDirectory
+    default: ''
 jobs:
   - deployment: createrelease
     dependsOn: performpr
@@ -41,6 +43,30 @@ jobs:
           deploy:
               steps:
                 - checkout: self
+                - powershell: |
+                    $env:GIT_REDIRECT_STDERR = '2>&1'
+                    $RepoURL = "https://Cadacious:$env:PERSONALACCESSTOKEN@github.com/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}"
+
+                    Set-Location ${{ parameters.TempDirectory }}
+                    Remove-Item ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }} -recurse -force -erroraction silentlycontinue
+                    git config --global user.name "Azure-Pipelines"
+                    git config --global user.email "Azure-Pipelines@SandboxServers.games"
+                    
+                    git clone --branch ${{ parameters.GitHubSourceBranch }} $RepoURL
+
+                    Set-Location $(Agent.TempDirectory)\${{ parameters.GitHubRepo }}
+
+                    If("${{ parameters.CreatePrerelease }}" -eq $true){
+                      git tag "${{ parameters.ModpackVersion }}-preview"
+                    }
+                    else{
+                      git tag ${{ parameters.ModpackVersion }}
+                    } 
+
+                    git push --tags
+                  displayName: Create Git Tag
+                  env:
+                    PersonalAccessToken: $(Git-Token)
                 - task: GitHubRelease@1
                   displayName: "Create Github Prerelease"
                   name: githubprerelease
@@ -51,7 +77,7 @@ jobs:
                     action: 'create'
                     target: '${{ parameters.ModpackVersion }}'
                     tagSource: 'userSpecifiedTag'
-                    tag: 'v${{ parameters.ModpackVersion }}'
+                    tag: 'v${{ parameters.ModpackVersion }}-preview'
                     title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
                     releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
                     assets: |
