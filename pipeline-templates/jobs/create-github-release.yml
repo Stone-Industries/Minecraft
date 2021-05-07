@@ -56,7 +56,7 @@ jobs:
 
                     Set-Location $(Agent.TempDirectory)\${{ parameters.GitHubRepo }}
 
-                    If(${{ parameters.CreatePrerelease }} -eq $true){
+                    If("${{ parameters.CreatePrerelease }}" -eq "true"){
                       git tag ${{ parameters.ModpackVersion }}-preview
                     }
                     else{
