@@ -1,4 +1,4 @@
-**Stone Industries**
+# **Stone Industries**
 This Minecraft modpack is being put together by the team at [Stone Industries](https://discord.gg/VrgmsNJUmq). Please join us on our discord server to learn more!
 
 # **Project Status**
