@@ -6,6 +6,8 @@ parameters:
   - name: PipelineWorkspace
     default: ''
   - name: isProdDeployment
+  - name: StageName
+    default: Prod
 stages:
   - stage: prod
     displayName: "prod"
@@ -16,3 +18,4 @@ stages:
           ServerID: ${{ parameters.ServerID }}
           PterodactylAddress: ${{ parameters.PterodactylAddress }}
           PipelineWorkspace: ${{ parameters.PipelineWorkspace }}
+          StageName: ${{ parameters.StageName }}

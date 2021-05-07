@@ -21,6 +21,8 @@ parameters:
     default: ''
   - name: TempDirectory
     default: ''
+  - name: StageName
+    default: dev
 stages:
   - stage: dev
     displayName: "Dev"
@@ -31,6 +33,7 @@ stages:
           ServerID: ${{ parameters.ServerID }}
           PterodactylAddress: ${{ parameters.PterodactylAddress }}
           PipelineWorkspace: ${{ parameters.PipelineWorkspace }}
+          StageName: ${{ parameters.StageName }}
 
       - template: ../jobs/perform-github-pr.yml
         parameters:

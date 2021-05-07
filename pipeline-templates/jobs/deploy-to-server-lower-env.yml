@@ -5,11 +5,12 @@ parameters:
     default: ''
   - name: PipelineWorkspace
     default: ''
-
+  - name: StageName
+    default: ''
 jobs:
   - deployment: deployserver
-    environment: StoneIndustries-${{ Variables.System.StageName }}
-    displayName: "Deploy to ${{ Variables.System.StageName }} Instance"
+    environment: StoneIndustries-${{ parameters.StageName }}
+    displayName: "Deploy to ${{ parameters.StageName }} Instance"
     workspace:
       clean: all
     strategy:
@@ -92,15 +93,15 @@ jobs:
                 Write-Error $PSItem
               }
 
-            displayName: "Remove serverlock and modpack files on $(System.StageName) server"
+            displayName: "Remove serverlock and modpack files on ${{ parameters.StageName }} server"
             env:
               PterodactylToken: $(Pterodactyl-Token)
             failOnStderr: true
             name: deletefiles
           - task: CopyFilesOverSSH@0
-            displayName: "Copy files to $(System.StageName)"
+            displayName: "Copy files to ${{ parameters.StageName }}"
             inputs:
-              sshEndpoint: 'StoneIndustries-Minecraft-SSH-Dev'
+              sshEndpoint: StoneIndustries-Minecraft-SSH-${{ parameters.StageName }}
               sourceFolder: '${{ parameters.PipelineWorkspace }}\server-modpack-download'
               contents: '**'
               targetFolder: '/'
