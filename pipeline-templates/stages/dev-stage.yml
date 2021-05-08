@@ -15,20 +15,17 @@ parameters:
     default: ''
   - name: CreatePrerelease
     default: false
-  - name: ReleaseNotes
-    default: ''
-  - name: SourcesDirectory
-    default: ''
-  - name: TempDirectory
-    default: ''
+  - name: PushToGithub
+    default: true
   - name: StageName
     default: dev
+
 stages:
   - stage: dev
     displayName: "Dev"
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      - template: ../jobs/deploy-to-server-lower-env.yml
+      - template: ../jobs/deploy-to-server.yml
         parameters:
           ServerID: ${{ parameters.ServerID }}
           PterodactylAddress: ${{ parameters.PterodactylAddress }}
@@ -42,6 +39,7 @@ stages:
           GitHubSourceBranch: dev
           GitHubDestinationBranch: staging
           ModpackVersion: ${{ parameters.ModpackVersion }}
+          PushToGithub: ${{ parameters.PushToGithub }}
 
       - template: ../jobs/create-github-release.yml
         parameters:
@@ -51,4 +49,3 @@ stages:
           GitHubRepo: ${{ parameters.GitHubRepo }}
           GitHubSourceBranch: dev
           CreatePrerelease: ${{ parameters.CreatePrerelease }}
-          ReleaseNotes: ${{ parameters.ReleaseNotes }}

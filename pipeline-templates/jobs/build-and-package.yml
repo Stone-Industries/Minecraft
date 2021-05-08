@@ -18,12 +18,7 @@ parameters:
       - server
   - name: OutputLocation
     default:
-  - name: SourcesDirectory
-    default:
-  - name: BinariesDirectory
-    default:
-  - name: ArtifactDirectory
-    default:
+
 jobs:
   - job: buildandpackage
     displayName: "Build and Package ${{ parameters.ManifestType }}"
@@ -35,12 +30,12 @@ jobs:
         $OutputLocation = "${{ parameters.OutputLocation}}\manifest.json"
 
         #Add PowerShell function to current session that was retrieved from repo
-        . ${{ parameters.SourcesDirectory }}\scripts\New-ModpackManifest.ps1
-        . ${{ parameters.SourcesDirectory }}\scripts\Format-Json.ps1
+        . $(Build.SourcesDirectory)\scripts\New-ModpackManifest.ps1
+        . $(Build.SourcesDirectory)\scripts\Format-Json.ps1
 
         #Build manifest file
         Try{
-        New-Item -Path ${{ parameters.BinariesDirectory}} -Name ${{ parameters.ManifestType}} -ItemType Directory
+        New-Item -Path $(Build.BinariesDirectory) -Name ${{ parameters.ManifestType}} -ItemType Directory
 
         New-ModpackManifest `
             -MinecraftVersion ${{ parameters.MinecraftVersion }} `
@@ -59,9 +54,9 @@ jobs:
       displayName: Create ${{ parameters.ManifestType}} Manifest
 
     - powershell: |
-        Set-Location ${{ parameters.SourcesDirectory }}
-        $Content = get-content -raw -path ${{ parameters.SourcesDirectory }}\scripts\startserver.sh; 
-        $Content -replace "`r`n","`n" | set-content -path ${{ parameters.SourcesDirectory }}\scripts\startserver.sh
+        Set-Location $(Build.SourcesDirectory)
+        $Content = get-content -raw -path $(Build.SourcesDirectory)\scripts\startserver.sh; 
+        $Content -replace "`r`n","`n" | set-content -path $(Build.SourcesDirectory)\scripts\startserver.sh
         $Content = get-content -raw -path ${{ parameters.OutputLocation}}\manifest.json 
         $Content -replace "`r`n","`n" | set-content -path ${{ parameters.OutputLocation }}\manifest.json
       displayName: "Dos2Unix conversion"
@@ -71,18 +66,18 @@ jobs:
       displayName: Copy Scripts
       name: copyscripts
       inputs:
-        SourceFolder: '${{ parameters.SourcesDirectory }}\scripts'
+        SourceFolder: '$(Build.SourcesDirectory)\scripts'
         Contents: |
             startserver.sh
             server-setup-config.yaml
             !readme.md
-        TargetFolder: '${{ parameters.ArtifactDirectory }}'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
     - task: CopyFiles@2
       displayName: Copy Client Configs
       name: copyclient
       inputs:
-        SourceFolder: '${{ parameters.SourcesDirectory }}\client-config'
+        SourceFolder: '$(Build.SourcesDirectory)\client-config'
         Contents: |
           **
           !readme.md
@@ -92,7 +87,7 @@ jobs:
       displayName: Copy Server Configs
       name: copyserver
       inputs:
-        SourceFolder: '${{ parameters.SourcesDirectory }}\server-config'
+        SourceFolder: '$(Build.SourcesDirectory)\server-config'
         Contents: |
             **
             !readme.md
@@ -102,7 +97,7 @@ jobs:
       displayName: Copy World Configs
       name: copyworld
       inputs:
-        SourceFolder: '${{ parameters.SourcesDirectory }}\world-config'
+        SourceFolder: '$(Build.SourcesDirectory)\world-config'
         Contents: |
           **
           !readme.md
@@ -112,7 +107,7 @@ jobs:
       displayName: Copy KubeJS Files
       name: copykubejs
       inputs:
-        SourceFolder: '${{ parameters.SourcesDirectory }}\kubejs'
+        SourceFolder: '$(Build.SourcesDirectory)\kubejs'
         Contents: |
             **
             !readme.md
@@ -125,7 +120,7 @@ jobs:
         rootFolderOrFile: '${{ parameters.OutputLocation}}'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '${{ parameters.ArtifactDirectory }}\modpack-download-${{ parameters.ManifestType }}.zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)\modpack-download-${{ parameters.ManifestType }}.zip'
         replaceExistingArchive: false
 
     - task: PublishPipelineArtifact@1
@@ -133,6 +128,6 @@ jobs:
       displayName: Publish Pipeline Artifact
       name: publish
       inputs:
-          targetPath: '${{ parameters.ArtifactDirectory }}'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
           artifact: '${{ parameters.ManifestType}}-modpack-download'
           publishLocation: 'pipeline'

@@ -18,7 +18,7 @@ jobs:
         deploy:
           steps:
           - powershell: |
-              $Body = @{"signal" = "kill";} | ConvertTo-JSON -Compress
+              $Body = @{"signal" = "stop";} | ConvertTo-JSON -Compress
 
               $Headers = @{
                 "authorization"="Bearer $env:PTERODACTYLTOKEN";
@@ -98,6 +98,14 @@ jobs:
               PterodactylToken: $(Pterodactyl-Token)
             failOnStderr: true
             name: deletefiles
+          - powershell: |
+              $Config = (Get-Content $(Pipeline.Workspace)\server-modpack-download\server-setup-config.yaml) `
+                -replace "autoRestart: yes", "autoRestart: no" `
+                -replace "maxRam: 5G", "maxRam: 12G" `
+                | Out-File $(Pipeline.Workspace)\server-modpack-download\server-setup-config.yaml 
+            displayName: "Set server-setup-config defaults"
+            failOnStderr: true
+            name: setserverconfig
           - task: CopyFilesOverSSH@0
             displayName: "Copy files to ${{ parameters.StageName }}"
             inputs:
