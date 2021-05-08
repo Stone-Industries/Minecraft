@@ -1,0 +1,160 @@
+parameters:
+  - name: ServerID
+    default: ''
+  - name: PterodactylAddress
+    default: ''
+  - name: PipelineWorkspace
+    default: ''
+  - name: StageName
+    default: ''
+jobs:
+  - deployment: deployserver
+    environment: StoneIndustries-${{ parameters.StageName }}
+    displayName: "Deploy to ${{ parameters.StageName }} Instance"
+    workspace:
+      clean: all
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - powershell: |
+              $Body = @{"signal" = "kill";} | ConvertTo-JSON -Compress
+
+              $Headers = @{
+                "authorization"="Bearer $env:PTERODACTYLTOKEN";
+                "accept"="Application/vnd.pterodactyl.v1+json";
+                "content-type"="application/json";
+              }
+
+              $APIEndpoint = "api/client/servers/${{ parameters.ServerID }}/power"
+
+              Try{
+                Write-Host "Invoking server stop via Pterodactyl API"
+
+                Invoke-RestMethod -Method Post -Uri "${{ parameters.PterodactylAddress }}/$APIEndpoint" -Headers $Headers -body "$Body"
+              }
+              Catch{
+                Write-Error $PSItem
+              }
+
+              #Give server time to stop
+              Start-Sleep 3
+
+              $DesiredState = "Offline"
+              $StateReached = $false
+              $i = 1
+              $MaximumRetries = 5
+              $PollingInterval = 10
+
+              $APIEndpoint = "api/client/servers/${{ parameters.ServerID }}/resources"
+
+              Do{
+                Write-Host "Testing to see if server instance is $DesiredState. Test $i of $MaximumRetries."
+                
+                $REST = Invoke-RestMethod -Method Get -Uri "${{ parameters.PterodactylAddress }}/$APIEndpoint" -Headers $Headers
+
+                If($REST.attributes.current_state -eq "$DesiredState"){
+                  $StateReached = $True
+                }
+                else{
+                  $i++
+                  Start-Sleep $PollingInterval
+                }
+
+                If($i -eq $MaximumRetries+1){
+                  Write-Error "$(System.StageName) instance did not reached $DesiredState state after $MaximumRetries health checks ($($PollingInterval*$MaximumRetries) seconds)."
+                }
+              }Until($StateReached -eq $True)
+            displayName: "Stop $(System.StageName) server"
+            env:
+              PterodactylToken: $(Pterodactyl-Token)
+            failOnStderr: true
+            name: stopserver
+          - powershell: |
+              $Body = @{
+                "root" = "/";
+                "files" = @("modpack-download-server.zip", "serverstarter.lock", "server-setup-config.yaml", "startserver.sh", "manifest.json")
+              } | ConvertTo-JSON -Compress
+
+              $Headers = @{
+                "authorization"="Bearer $env:PTERODACTYLTOKEN";
+                "accept"="Application/vnd.pterodactyl.v1+json";
+                "content-type"="application/json";
+              }
+
+              $APIEndpoint = "api/client/servers/${{ parameters.ServerID }}/files/delete"
+
+              Try{
+                Write-Host "Invoking server stop via Pterodactyl API"
+
+                Invoke-RestMethod -Method Post -Uri "${{ parameters.PterodactylAddress }}/$APIEndpoint" -Headers $Headers -body "$Body"
+              }
+              Catch{
+                Write-Error $PSItem
+              }
+
+            displayName: "Remove serverlock and modpack files on ${{ parameters.StageName }} server"
+            env:
+              PterodactylToken: $(Pterodactyl-Token)
+            failOnStderr: true
+            name: deletefiles
+          - task: CopyFilesOverSSH@0
+            displayName: "Copy files to ${{ parameters.StageName }}"
+            inputs:
+              sshEndpoint: StoneIndustries-Minecraft-SSH-${{ parameters.StageName }}
+              sourceFolder: '${{ parameters.PipelineWorkspace }}\server-modpack-download'
+              contents: '**'
+              targetFolder: '/'
+              readyTimeout: '20000'
+              overwrite: false
+              failOnEmptySource: true
+          - powershell: |
+              $Body = @{"signal" = "start";} | ConvertTo-JSON -Compress
+
+              $Headers = @{
+                "authorization"="Bearer $env:PTERODACTYLTOKEN";
+                "accept"="Application/vnd.pterodactyl.v1+json";
+                "content-type"="application/json";
+              }
+
+              $APIEndpoint = "api/client/servers/${{ parameters.ServerID }}/power"
+
+              Try{
+                Write-Host "Invoking server start via Pterodactyl API"
+
+                Invoke-RestMethod -Method Post -Uri "${{ parameters.PterodactylAddress }}/$APIEndpoint" -Headers $Headers -Body "$Body"
+              }
+              Catch{
+                Write-Error $PSItem
+              }
+              
+              $DesiredState = "Started"
+              $StateReached = $false
+              $i = 1
+              $MaximumRetries = 10
+              $PollingInterval = 30
+              
+              $APIEndpoint = "api/client/servers/${{ parameters.ServerID }}/resources"
+
+              Do{
+                Write-Host "Testing to see if server instance has fully $DesiredState. Test $i of $MaximumRetries."
+                
+                $REST = Invoke-RestMethod -Method Get -Uri "${{ parameters.PterodactylAddress }}/$APIEndpoint" -Headers $Headers
+
+                If($REST.attributes.current_state -eq "Running"){
+                  $StateReached = $True
+                }
+                else{
+                  $i++
+                  Start-Sleep $PollingInterval
+                }
+
+                If($i -eq $MaximumRetries+1){
+                    Write-Error "$(System.StageName) instance did not reached $DesiredState state after $MaximumRetries health checks ($($PollingInterval*$MaximumRetries) seconds)."
+                }
+              }Until($StateReached -eq $True)
+            displayName: "Start $(System.StageName) server"
+            env:
+              PterodactylToken: $(Pterodactyl-Token)
+            failOnStderr: true
+            name: startserver

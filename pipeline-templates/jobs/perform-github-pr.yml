@@ -1,0 +1,48 @@
+parameters:
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: GitHubSourceBranch
+    default: ''
+  - name: GitHubDestinationBranch
+    default: ''
+  - name: ModpackVersion
+    default: ''
+jobs:
+  - deployment: performpr
+    dependsOn: deployserver
+    environment: StoneIndustries-${{ variables.System.StageName }}
+    displayName: "Pull Request to ${{ parameters.GitHubDestinationBranch }}"
+    workspace:
+        clean: all
+    strategy:
+        runOnce:
+          deploy:
+              steps:
+              - task: CreatePullRequest@1
+                displayName: "Create Pull Request"
+                inputs:
+                  repoType: 'GitHub'
+                  githubEndpoint: 'github.com_Cadacious'
+                  githubRepository: 'Stone-Industries/Minecraft'
+                  sourceBranch: '${{ parameters.GitHubSourceBranch }}'
+                  targetBranch: '${{ parameters.GitHubDestinationBranch }}'
+                  title: 'Stone Industries (${{ parameters.ModpackVersion }})'
+                  description: 'Opening Pull Request via Azure Pipelines to ${{ parameters.GitHubDestinationBranch }} branch after successful deployment to ${{ parameters.GitHubDestinationBranch }} server.'
+                  passPullRequestIdBackToADO: true
+              - powershell: |
+                  $Token = $env:PERSONALACCESSTOKEN
+
+                  $Body = [Ordered]@{
+                  "commit_message"="Completing PR to ${{ parameters.GitHubDestinationBranch }} branch via Azure Pipelines"
+                  "merge_method"="merge"
+                  } | convertto-json
+
+                  $Headers = @{"Authorization"="token $Token"; "accept"="application/vnd.github.v3+json"}
+                  $URI = "https://api.github.com/repos/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}/pulls/$(pullRequestId)/merge"
+
+                  Invoke-RestMethod -Method Put -uri $URI -Headers $Headers -body "$body" | Tee-Object -Variable REST
+                displayName: "Merge Pull Request"
+                env:
+                    PersonalAccessToken: $(Git-Token)

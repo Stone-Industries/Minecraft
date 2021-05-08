@@ -1,0 +1,56 @@
+parameters:
+  - name: ModpackVersion
+    default: ''
+  - name: ModpackName
+    default: ''
+  - name: ServerID
+    default: ''
+  - name: PterodactylAddress
+    default: ''
+  - name: PipelineWorkspace
+    default: ''
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: GitHubBranch
+    default: ''
+  - name: CreateRelease
+    default:
+  - name: ReleaseNotes
+    default:
+  - name: SourcesDirectory
+    default:
+  - name: TempDirectory
+    default:
+  - name: StageName
+    default: staging
+stages:
+  - stage: staging
+    displayName: "Staging"
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - template: ../jobs/deploy-to-server-lower-env.yml
+        parameters:
+          ServerID: ${{ parameters.ServerID }}
+          PterodactylAddress: ${{ parameters.PterodactylAddress }}
+          PipelineWorkspace: ${{ parameters.PipelineWorkspace }}
+          StageName: ${{ parameters.StageName }}
+
+      - template: ../jobs/perform-github-pr.yml
+        parameters:
+          GitHubOrg: ${{ parameters.GitHubOrg }}
+          GitHubRepo: ${{ parameters.GitHubRepo }}
+          GitHubSourceBranch: staging
+          GitHubDestinationBranch: main
+          ModpackVersion: ${{ parameters.ModpackVersion }}
+
+      - template: ../jobs/create-github-release.yml
+        parameters:
+          ModpackVersion: ${{ parameters.ModpackVersion }}
+          ModpackName: ${{ parameters.ModpackName }}
+          GitHubOrg: ${{ parameters.GitHubOrg }}
+          GitHubRepo: ${{ parameters.GitHubRepo }}
+          GitHubSourceBranch: staging
+          CreateRelease: ${{ parameters.CreateRelease }}
+          ReleaseNotes: ${{ parameters.ReleaseNotes }}

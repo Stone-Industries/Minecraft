@@ -1,0 +1,99 @@
+name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# resources:
+#   pipelines:
+#     - pipeline: serverstarter
+#       branch: master
+#       project: StoneIndustries
+#       source: ServerStarter
+#       trigger:
+#         stages:
+#           - dev
+
+parameters:
+  - name: MinecraftVersion
+    displayName: Minecraft Version
+    type: string
+    default: 1.16.5
+  - name: ModpackName
+    displayName: Modpack Name
+    type: string
+    default: Stone Industries
+  - name: ModpackAuthor
+    displayName: Modpack Author
+    type: string
+    default: Stone Industries Team
+  - name: ModpackVersion
+    displayName: Modpack Version
+    type: string
+    default: 0.0.2
+  - name: ForgeVersion
+    displayName: Forge Version
+    type: string
+    default: 36.1.2
+  - name: ReleaseNotes
+    displayName: Release Notes
+    type: string
+    default: ''
+  - name: GitHubOrg
+    displayName: GitHub Organization
+    type: string
+    default: 'Stone-Industries'
+  - name: GitHubRepo
+    displayName: GitHub Repo
+    type: string
+    default: 'Minecraft'
+  - name: PterodactylAddress
+    displayName: Pterodactyl Address
+    type: string
+    default: 'https://pterodactyl.sandboxservers.games'
+  - name: CreatePrerelease
+    displayName: Create Prerelease
+    type: boolean
+    default: false
+  - name: CreateRelease
+    displayName: Create Release
+    type: boolean
+    default: false
+  - name: isProdDeployment
+    displayName: Deploy To Prod
+    type: boolean
+    default: false
+
+variables:
+ - group: StoneIndustries-Modpack
+ - group: StoneIndustries-Git
+
+trigger: 
+  branches:
+    include:
+      - master
+      - prerelease/*
+      - release/*
+  tags:
+    include:
+      - prerelease/*
+      - release/*
+
+pool:
+  name: Sandbox Servers Agents
+
+stages:
+  - template: pipeline-templates/pipelines/modpack-pipeline.yml
+    parameters:
+      MinecraftVersion: ${{ parameters.MinecraftVersion }}
+      ModpackVersion: ${{ parameters.ModpackVersion }}
+      ForgeVersion: ${{ parameters.ForgeVersion }}
+      ModpackName: ${{ parameters.ModpackName }}
+      ModpackAuthor: ${{ parameters.ModpackAuthor }}
+      PterodactylAddress: ${{ parameters.PterodactylAddress }}
+      GitHubOrg: ${{ parameters.GitHubOrg }}
+      GitHubRepo: ${{ parameters.GitHubRepo }}
+      CreatePrerelease: ${{ parameters.CreatePrerelease }}
+      CreateRelease: ${{ parameters.CreateRelease }}
+      ReleaseNotes: ${{ parameters.ReleaseNotes }}
+      isProdDeployment: ${{ parameters.isProdDeployment }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      BinariesDirectory: $(Build.BinariesDirectory)
+      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
+      PipelineWorkspace: $(Pipeline.Workspace)

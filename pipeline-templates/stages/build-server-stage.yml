@@ -1,0 +1,47 @@
+parameters:
+  - name: MinecraftVersion
+    default: ''
+  - name: ModpackName
+    default: ''
+  - name: ModpackAuthor
+    default: ''
+  - name: ModpackVersion
+    default: ''
+  - name: ForgeVersion
+    default: ''
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: SourcesDirectory
+    default:
+  - name: BinariesDirectory
+    default:
+  - name: ArtifactDirectory
+    default:
+  - name: TempDirectory
+    default:
+stages:
+  - stage: build_server
+    displayName: "Build and Package Server"
+    jobs:
+    - template: ../jobs/build-and-package.yml
+      parameters:
+        MinecraftVersion: ${{ parameters.MinecraftVersion }}
+        ModpackVersion: ${{ parameters.ModpackVersion }}
+        ForgeVersion: ${{ parameters.ForgeVersion }}
+        ModpackName: ${{ parameters.ModpackName }}
+        ModpackAuthor: ${{ parameters.ModpackAuthor }}
+        ModListPath: ${{ parameters.SourcesDirectory }}\modlist-server.csv
+        ManifestType: server
+        OutputLocation: ${{ parameters.BinariesDirectory }}\server
+        SourcesDirectory: ${{ parameters.SourcesDirectory }}
+        BinariesDirectory: ${{ parameters.BinariesDirectory }}
+        ArtifactDirectory: ${{ parameters.ArtifactDirectory }}
+
+    - template: ../jobs/push-to-github.yml
+      parameters:
+        GitHubOrg: ${{ parameters.GitHubOrg }}
+        GitHubRepo: ${{ parameters.GitHubRepo }}
+        SourcesDirectory: ${{ parameters.SourcesDirectory }}
+        TempDirectory: ${{ parameters.TempDirectory }}

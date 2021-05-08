@@ -1,0 +1,106 @@
+parameters:
+  - name: ModpackVersion
+    default: ''
+  - name: ModpackName
+    default: ''
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: GitHubSourceBranch
+    default: ''
+  - name: CreatePrerelease
+    default: false
+  - name: CreateRelease
+    default: false
+  - name: ReleaseNotes
+    default: ''
+  - name: TempDirectory
+    default: ''
+jobs:
+  - deployment: createrelease
+    dependsOn: performpr
+    condition: |
+      or(
+        and(
+          succeeded(), 
+          eq(
+            '${{ parameters.CreatePrerelease }}', true
+          )
+        ),
+        and(
+          succeeded(), 
+          eq(
+            '${{ parameters.CreateRelease }}', true
+          )
+        )
+      )
+    environment: StoneIndustries-${{ Variables.System.StageName }}
+    workspace:
+        clean: all
+    strategy:
+        runOnce:
+          deploy:
+              steps:
+                - checkout: self
+                - powershell: |
+                    $env:GIT_REDIRECT_STDERR = '2>&1'
+                    $RepoURL = "https://Cadacious:$env:PERSONALACCESSTOKEN@github.com/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}"
+
+                    Set-Location $(Agent.TempDirectory)
+                    Remove-Item $(Agent.TempDirectory)\${{ parameters.GitHubRepo }} -recurse -force -erroraction silentlycontinue
+                    git config --global user.name "Azure-Pipelines"
+                    git config --global user.email "Azure-Pipelines@SandboxServers.games"
+                    
+                    git clone --branch ${{ parameters.GitHubSourceBranch }} $RepoURL
+
+                    Set-Location $(Agent.TempDirectory)\${{ parameters.GitHubRepo }}
+
+                    If("${{ parameters.CreatePrerelease }}" -eq "true"){
+                      git tag ${{ parameters.ModpackVersion }}-preview
+                    }
+                    else{
+                      git tag ${{ parameters.ModpackVersion }}
+                    }
+
+                    git push --tags
+                  displayName: Create Git Tag
+                  env:
+                    PersonalAccessToken: $(Git-Token)
+                - task: GitHubRelease@1
+                  displayName: "Create Github Prerelease"
+                  name: githubprerelease
+                  condition: and(succeeded(), eq(${{ parameters.CreatePrerelease }}, 'true'))
+                  inputs:
+                    gitHubConnection: 'github.com_Cadacious'
+                    repositoryName: 'Stone-Industries/Minecraft'
+                    action: 'create'
+                    target: '${{ parameters.GitHubSourceBranch }}'
+                    tagSource: 'userSpecifiedTag'
+                    tag: '${{ parameters.ModpackVersion }}-preview'
+                    title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
+                    releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
+                    assets: |
+                      $(Pipeline.Workspace)/server-modpack-download/*
+                      $(Pipeline.Workspace)/client-modpack-download/*
+                    isPreRelease: true
+                    addChangeLog: false
+                - task: GitHubRelease@1
+                  displayName: "Create Github Release"
+                  name: githubrelease
+                  condition: and(succeeded(), eq(${{ parameters.CreateRelease }}, 'true'))
+                  inputs:
+                    gitHubConnection: 'github.com_Cadacious'
+                    repositoryName: 'Stone-Industries/Minecraft'
+                    action: 'create'
+                    target: '${{ parameters.GitHubSourceBranch }}'
+                    tagSource: 'userSpecifiedTag'
+                    tag: '${{ parameters.ModpackVersion }}'
+                    title: '${{ parameters.ModpackName }} (${{ parameters.ModpackVersion }})'
+                    releaseNotesFilePath: 'change-logs/${{ parameters.ModpackVersion }}.md'
+                    assets: |
+                      $(Pipeline.Workspace)/server-modpack-download/*
+                      $(Pipeline.Workspace)/client-modpack-download/*
+                    isPreRelease: false
+                    changeLogCompareToRelease: 'lastFullRelease'
+                    changeLogType: 'commitBased'

@@ -1,0 +1,21 @@
+parameters:
+  - name: ServerID
+    default: ''
+  - name: PterodactylAddress
+    default: ''
+  - name: PipelineWorkspace
+    default: ''
+  - name: isProdDeployment
+  - name: StageName
+    default: Prod
+stages:
+  - stage: prod
+    displayName: "prod"
+    condition: and(succeeded(), eq(${{ parameters.isProdDeployment }}, 'true'))
+    jobs:
+      - template: ../jobs/deploy-to-server-lower-env.yml
+        parameters:
+          ServerID: ${{ parameters.ServerID }}
+          PterodactylAddress: ${{ parameters.PterodactylAddress }}
+          PipelineWorkspace: ${{ parameters.PipelineWorkspace }}
+          StageName: ${{ parameters.StageName }}

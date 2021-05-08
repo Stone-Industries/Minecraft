@@ -1,0 +1,54 @@
+parameters:
+  - name: ModpackVersion
+    default: ''
+  - name: ModpackName
+    default: ''
+  - name: ServerID
+    default: ''
+  - name: PterodactylAddress
+    default: ''
+  - name: PipelineWorkspace
+    default: ''
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: CreatePrerelease
+    default: false
+  - name: ReleaseNotes
+    default: ''
+  - name: SourcesDirectory
+    default: ''
+  - name: TempDirectory
+    default: ''
+  - name: StageName
+    default: dev
+stages:
+  - stage: dev
+    displayName: "Dev"
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - template: ../jobs/deploy-to-server-lower-env.yml
+        parameters:
+          ServerID: ${{ parameters.ServerID }}
+          PterodactylAddress: ${{ parameters.PterodactylAddress }}
+          PipelineWorkspace: ${{ parameters.PipelineWorkspace }}
+          StageName: ${{ parameters.StageName }}
+
+      - template: ../jobs/perform-github-pr.yml
+        parameters:
+          GitHubOrg: ${{ parameters.GitHubOrg }}
+          GitHubRepo: ${{ parameters.GitHubRepo }}
+          GitHubSourceBranch: dev
+          GitHubDestinationBranch: staging
+          ModpackVersion: ${{ parameters.ModpackVersion }}
+
+      - template: ../jobs/create-github-release.yml
+        parameters:
+          ModpackVersion: ${{ parameters.ModpackVersion }}
+          ModpackName: ${{ parameters.ModpackName }}
+          GitHubOrg: ${{ parameters.GitHubOrg }}
+          GitHubRepo: ${{ parameters.GitHubRepo }}
+          GitHubSourceBranch: dev
+          CreatePrerelease: ${{ parameters.CreatePrerelease }}
+          ReleaseNotes: ${{ parameters.ReleaseNotes }}
