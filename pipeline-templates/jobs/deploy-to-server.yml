@@ -99,7 +99,10 @@ jobs:
             failOnStderr: true
             name: deletefiles
           - powershell: |
-              $Config = Get-Content $(Pipeline.Workspace)\server-modpack-download\server-setup-config.yaml -replace "autoRestart: yes", "autoRestart: no" -replace "maxRam: 5G", "maxRam: 12G" | Out-File $(Pipeline.Workspace)\server-modpack-download\server-setup-config.yaml 
+              $Config = (Get-Content $(Pipeline.Workspace)\server-modpack-download\server-setup-config.yaml) `
+                -replace "autoRestart: yes", "autoRestart: no" `
+                -replace "maxRam: 5G", "maxRam: 12G" `
+                | Out-File $(Pipeline.Workspace)\server-modpack-download\server-setup-config.yaml 
             displayName: "Set server-setup-config defaults"
             failOnStderr: true
             name: setserverconfig
