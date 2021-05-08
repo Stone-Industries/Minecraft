@@ -16,7 +16,7 @@ I:defaultguiscale = '-1';
 
 ##[customization]
 
-B:showcustomizationbuttons = 'true';
+B:showcustomizationbuttons = 'false';
 
 
 ##[mainmenu]
@@ -43,11 +43,12 @@ S:splashorientation = 'original';
 ##[loading]
 
 B:allowgameintroskip = 'true';
-S:loadinganimationcolor = '#ffffffff';
+S:loadinganimationcolor = '#ffffff;
+B:showanimationloadingstatus = 'true';
 B:showanimationloadingstatus = 'true';
 S:gameintroanimation = '';
 S:customgameintroskiptext = '';
-B:loadingscreendarkmode = 'false';
+B:loadingscreendarkmode = 'true';
 
 
 ##[minecraftwindow]
@@ -68,9 +69,9 @@ B:showloadingscreenpercent = 'true';
 
 B:editordeleteconfirmation = 'true';
 [If the warning when trying to move an vanilla button without an orientation should be displayed or not.]
-B:showvanillamovewarning = 'true';
+B:showvanillamovewarning = 'false';
 
 
 ##[ui]
 
-F:uiscale = '1.0';
+F:uiscale = '3.0';

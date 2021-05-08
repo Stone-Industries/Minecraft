@@ -1,0 +1,70 @@
+type = menu
+
+customization-meta {
+  identifier = net.minecraft.client.gui.screen.MainMenuScreen
+  renderorder = foreground
+}
+
+customization {
+  identifier = %id=502346%
+  action = hidebutton
+}
+
+customization {
+  identifier = %id=376346%
+  action = hidebutton
+}
+
+customization {
+  identifier = %id=400382%
+  orientation = bottom-right
+  x = -212
+  action = movebutton
+  y = -84
+}
+
+customization {
+  identifier = %id=502382%
+  orientation = bottom-right
+  x = -314
+  action = movebutton
+  y = -60
+}
+
+customization {
+  identifier = %id=502382%
+  width = 200
+  action = resizebutton
+  height = 20
+}
+
+customization {
+  identifier = %id=604382%
+  orientation = bottom-right
+  x = -20
+  action = movebutton
+  y = -20
+}
+
+customization {
+  identifier = %id=400346%
+  orientation = bottom-centered
+  x = -100
+  action = movebutton
+  y = -84
+}
+
+customization {
+  identifier = %id=400346%
+  action = setbuttonlabel
+  value = Mods
+}
+
+customization {
+  identifier = %id=376382%
+  orientation = bottom-left
+  x = 0
+  action = movebutton
+  y = -20
+}
+

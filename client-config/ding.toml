@@ -35,7 +35,7 @@
 	#Play sound when the game loads.
 	playOnLoad = true
 	#Play sound when the world loads after connecting to a server.
-	playOnWorld = false
+	playOnWorld = true
 	#Play sound when resources complete reloading. Requires game to be restarted.
 	playOnResourcesReload = true
 
