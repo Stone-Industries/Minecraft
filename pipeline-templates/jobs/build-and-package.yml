@@ -49,6 +49,7 @@ jobs:
             -ModpackName "${{ parameters.ModpackName }}" `
             -ModpackAuthor "${{ parameters.ModpackAuthor }}" `
             -ModListPath ${{ parameters.ModListPath }} `
+            -ManifestType ${{ parameters.ManifestType }} `
             -OutputLocation $OutputLocation
         }
         catch{

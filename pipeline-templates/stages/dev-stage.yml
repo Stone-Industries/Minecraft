@@ -15,8 +15,6 @@ parameters:
     default: ''
   - name: CreatePrerelease
     default: false
-  - name: ReleaseNotes
-    default: ''
   - name: SourcesDirectory
     default: ''
   - name: TempDirectory
@@ -51,4 +49,3 @@ stages:
           GitHubRepo: ${{ parameters.GitHubRepo }}
           GitHubSourceBranch: dev
           CreatePrerelease: ${{ parameters.CreatePrerelease }}
-          ReleaseNotes: ${{ parameters.ReleaseNotes }}
