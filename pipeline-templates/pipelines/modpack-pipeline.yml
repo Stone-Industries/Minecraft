@@ -9,6 +9,8 @@ parameters:
     default: ''
   - name: ForgeVersion
     default: ''
+  - name: ReleaseNotes
+    default: ''
   - name: GitHubOrg
     default: ''
   - name: GitHubRepo
@@ -68,6 +70,7 @@ stages:
       SourcesDirectory: $(Build.SourcesDirectory)
       TempDirectory: $(Agent.TempDirectory)
       CreatePrerelease: ${{ parameters.CreatePrerelease }}
+      ReleaseNotes: ${{ parameters.ReleaseNotes }}
 
   - template: ../stages/staging-stage.yml
     parameters:
@@ -81,6 +84,7 @@ stages:
       SourcesDirectory: $(Build.SourcesDirectory)
       TempDirectory: $(Agent.TempDirectory)
       CreateRelease: ${{ parameters.CreateRelease }}
+      ReleaseNotes: ${{ parameters.ReleaseNotes }}
 
   - template: ../stages/prod-stage.yml
     parameters:
