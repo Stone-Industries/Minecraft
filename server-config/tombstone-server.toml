@@ -5,7 +5,7 @@
 	handle_player_xp = true
 	#Experience loss on death (%) [0..100|default:0]
 	#Range: 0 ~ 100
-	xp_loss = 0
+	xp_loss = 10
 	#The time in minutes before a Grave's Key isn't required to open a grave (-1 = disabled) [-1..MAX|default:-1]
 	#Range: > -1
 	decay_time = -1

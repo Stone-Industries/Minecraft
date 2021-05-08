@@ -35,7 +35,7 @@
 
 	[worldgeneration.dark_temple]
 		#Average distance between dark temples in chunks.
-		darkTempleSpacing = 40
+		darkTempleSpacing = 80
 		#Maximum blockState height at which a dark temple can spawn.
 		darkTempleMaxHeight = 90
 		#Minimum distance between dark temples in chunks, must be smaller than spacing.

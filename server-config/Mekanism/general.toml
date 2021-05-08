@@ -4,7 +4,7 @@
 	#Log Mekanism packet names. Debug setting.
 	logPackets = false
 	#Disable to make the anchor upgrade not do anything.
-	allowChunkloading = true
+	allowChunkloading = false
 	#How many ticks must pass until a block's active state is synced with the client, if it has been rapidly changing.
 	blockDeactivationDelay = 60
 	#Any mod ids added to this list will not be able to have any of their blocks, picked up by the cardboard box. For example: ["mekanism"]
@@ -147,7 +147,7 @@
 		#Enable the security system for players to prevent others from accessing their machines. Does NOT affect Frequencies.
 		allowProtection = true
 		#Ops can bypass the block security restrictions if enabled.
-		opsBypassRestrictions = false
+		opsBypassRestrictions = true
 
 	#Nutritional PasteSettings
 	[general.nutritional_paste]
