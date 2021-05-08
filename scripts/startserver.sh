@@ -115,12 +115,6 @@ function download_serverstart_jar {
 #load_ramdisk
 run_server
 
-# Check for a crash, restart once.
-if [ ! $? -eq 0 ]; then
-  echo "[!] Crash detected, restarting server once!"
-  run_server
-fi
-
 # Copy back the changes.
 #unload_ramdisk
 

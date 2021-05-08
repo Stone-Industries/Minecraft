@@ -13,7 +13,7 @@ stages:
     displayName: "prod"
     condition: and(succeeded(), eq(${{ parameters.isProdDeployment }}, 'true'))
     jobs:
-      - template: ../jobs/deploy-to-server-lower-env.yml
+      - template: ../jobs/deploy-to-server.yml
         parameters:
           ServerID: ${{ parameters.ServerID }}
           PterodactylAddress: ${{ parameters.PterodactylAddress }}
