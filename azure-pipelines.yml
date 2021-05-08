@@ -26,15 +26,11 @@ parameters:
   - name: ModpackVersion
     displayName: Modpack Version
     type: string
-    default: 0.0.2
+    default: 0.0.3
   - name: ForgeVersion
     displayName: Forge Version
     type: string
     default: 36.1.2
-  - name: ReleaseNotes
-    displayName: Release Notes
-    type: string
-    default: ''
   - name: GitHubOrg
     displayName: GitHub Organization
     type: string
@@ -91,7 +87,6 @@ stages:
       GitHubRepo: ${{ parameters.GitHubRepo }}
       CreatePrerelease: ${{ parameters.CreatePrerelease }}
       CreateRelease: ${{ parameters.CreateRelease }}
-      ReleaseNotes: ${{ parameters.ReleaseNotes }}
       isProdDeployment: ${{ parameters.isProdDeployment }}
       SourcesDirectory: $(Build.SourcesDirectory)
       BinariesDirectory: $(Build.BinariesDirectory)

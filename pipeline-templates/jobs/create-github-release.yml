@@ -13,8 +13,6 @@ parameters:
     default: false
   - name: CreateRelease
     default: false
-  - name: ReleaseNotes
-    default: ''
   - name: TempDirectory
     default: ''
 jobs:

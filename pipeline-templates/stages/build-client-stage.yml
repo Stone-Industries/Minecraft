@@ -31,7 +31,7 @@ stages:
         ForgeVersion: ${{ parameters.ForgeVersion }}
         ModpackName: ${{ parameters.ModpackName }}
         ModpackAuthor: ${{ parameters.ModpackAuthor }}
-        ModListPath: ${{ parameters.SourcesDirectory }}\modlist-client.csv
+        ModListPath: ${{ parameters.SourcesDirectory }}\modlist.csv
         ManifestType: client
         OutputLocation: ${{ parameters.BinariesDirectory }}\client
         SourcesDirectory: ${{ parameters.SourcesDirectory }}

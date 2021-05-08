@@ -32,7 +32,7 @@ stages:
         ForgeVersion: ${{ parameters.ForgeVersion }}
         ModpackName: ${{ parameters.ModpackName }}
         ModpackAuthor: ${{ parameters.ModpackAuthor }}
-        ModListPath: ${{ parameters.SourcesDirectory }}\modlist-server.csv
+        ModListPath: ${{ parameters.SourcesDirectory }}\modlist.csv
         ManifestType: server
         OutputLocation: ${{ parameters.BinariesDirectory }}\server
         SourcesDirectory: ${{ parameters.SourcesDirectory }}
