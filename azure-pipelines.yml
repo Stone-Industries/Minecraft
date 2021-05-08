@@ -11,14 +11,38 @@ name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
 #           - dev
 
 parameters:
+  - name: MinecraftVersion
+    displayName: Minecraft Version
+    type: string
+    default: 1.16.5
+  - name: ModpackName
+    displayName: Modpack Name
+    type: string
+    default: Stone Industries
+  - name: ModpackAuthor
+    displayName: Modpack Author
+    type: string
+    default: Stone Industries Team
   - name: ModpackVersion
     displayName: Modpack Version
     type: string
     default: 0.0.3
-  - name: PushToGithub
-    displayName: Push To Github
-    type: boolean
-    default: true
+  - name: ForgeVersion
+    displayName: Forge Version
+    type: string
+    default: 36.1.2
+  - name: GitHubOrg
+    displayName: GitHub Organization
+    type: string
+    default: 'Stone-Industries'
+  - name: GitHubRepo
+    displayName: GitHub Repo
+    type: string
+    default: 'Minecraft'
+  - name: PterodactylAddress
+    displayName: Pterodactyl Address
+    type: string
+    default: 'https://pterodactyl.sandboxservers.games'
   - name: CreatePrerelease
     displayName: Create Prerelease
     type: boolean
@@ -53,15 +77,18 @@ pool:
 stages:
   - template: pipeline-templates/pipelines/modpack-pipeline.yml
     parameters:
-      MinecraftVersion: $(MinecraftVersion)
+      MinecraftVersion: ${{ parameters.MinecraftVersion }}
       ModpackVersion: ${{ parameters.ModpackVersion }}
-      ForgeVersion: $(ForgeVersion)
-      ModpackName: $(ModpackName)
-      ModpackAuthor: $(ModpackAuthor)
-      PterodactylAddress: $(PterodactylAddress)
-      GitHubOrg: $(GitHubOrg)
-      GitHubRepo: $(GitHubRepo)
+      ForgeVersion: ${{ parameters.ForgeVersion }}
+      ModpackName: ${{ parameters.ModpackName }}
+      ModpackAuthor: ${{ parameters.ModpackAuthor }}
+      PterodactylAddress: ${{ parameters.PterodactylAddress }}
+      GitHubOrg: ${{ parameters.GitHubOrg }}
+      GitHubRepo: ${{ parameters.GitHubRepo }}
       CreatePrerelease: ${{ parameters.CreatePrerelease }}
       CreateRelease: ${{ parameters.CreateRelease }}
       isProdDeployment: ${{ parameters.isProdDeployment }}
-      PushToGithub: ${{ parameters.PushToGithub }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      BinariesDirectory: $(Build.BinariesDirectory)
+      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
+      PipelineWorkspace: $(Pipeline.Workspace)
