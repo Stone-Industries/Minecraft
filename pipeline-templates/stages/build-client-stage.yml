@@ -9,8 +9,16 @@ parameters:
     default: ''
   - name: ForgeVersion
     default: ''
-  - name: PushToGithub
-    default: true
+  - name: GitHubOrg
+    default: ''
+  - name: GitHubRepo
+    default: ''
+  - name: SourcesDirectory
+    default:
+  - name: BinariesDirectory
+    default:
+  - name: ArtifactDirectory
+    default:
 
 stages:
   - stage: build_client
@@ -23,6 +31,9 @@ stages:
         ForgeVersion: ${{ parameters.ForgeVersion }}
         ModpackName: ${{ parameters.ModpackName }}
         ModpackAuthor: ${{ parameters.ModpackAuthor }}
-        ModListPath: $(Build.SourcesDirectory)\modlist-client.csv
+        ModListPath: ${{ parameters.SourcesDirectory }}\modlist.csv
         ManifestType: client
-        OutputLocation: $(Build.BinariesDirectory)\client
+        OutputLocation: ${{ parameters.BinariesDirectory }}\client
+        SourcesDirectory: ${{ parameters.SourcesDirectory }}
+        BinariesDirectory: ${{ parameters.BinariesDirectory }}
+        ArtifactDirectory: ${{ parameters.ArtifactDirectory }}

@@ -13,7 +13,8 @@ parameters:
     default: false
   - name: CreateRelease
     default: false
-
+  - name: TempDirectory
+    default: ''
 jobs:
   - deployment: createrelease
     dependsOn: performpr

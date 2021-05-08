@@ -9,22 +9,26 @@ parameters:
     default: ''
   - name: ForgeVersion
     default: ''
-  - name: ReleaseNotes
-    default: ''
   - name: GitHubOrg
     default: ''
   - name: GitHubRepo
     default: ''
   - name: PterodactylAddress
     default: ''
-  - name: PushToGithub
-    default: true
   - name: CreatePrerelease
     default: false
   - name: CreateRelease
     default: false
   - name: isProdDeployment
     default: false
+  - name: SourcesDirectory
+    default: ''
+  - name: BinariesDirectory
+    default: ''
+  - name: ArtifactDirectory
+    default: ''
+  - name: PipelineWorkspace
+    default: ''
 
 stages:
   - template: ../stages/build-client-stage.yml
@@ -34,6 +38,9 @@ stages:
       ForgeVersion: ${{ parameters.ForgeVersion }}
       ModpackName: ${{ parameters.ModpackName }}
       ModpackAuthor: ${{ parameters.ModpackAuthor }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      BinariesDirectory: $(Build.BinariesDirectory)
+      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
   
   - template: ../stages/build-server-stage.yml
     parameters:
@@ -44,7 +51,10 @@ stages:
       ModpackAuthor: ${{ parameters.ModpackAuthor }}
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      PushToGithub: ${{ parameters.PushToGithub }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      BinariesDirectory: $(Build.BinariesDirectory)
+      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
+      TempDirectory: $(Agent.TempDirectory)
 
   - template: ../stages/dev-stage.yml
     parameters:
@@ -55,7 +65,8 @@ stages:
       PipelineWorkspace: $(Pipeline.Workspace)
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      PushToGithub: ${{ parameters.PushToGithub }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      TempDirectory: $(Agent.TempDirectory)
       CreatePrerelease: ${{ parameters.CreatePrerelease }}
 
   - template: ../stages/staging-stage.yml
@@ -67,7 +78,8 @@ stages:
       PipelineWorkspace: $(Pipeline.Workspace)
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      PushToGithub: ${{ parameters.PushToGithub }}
+      SourcesDirectory: $(Build.SourcesDirectory)
+      TempDirectory: $(Agent.TempDirectory)
       CreateRelease: ${{ parameters.CreateRelease }}
 
   - template: ../stages/prod-stage.yml

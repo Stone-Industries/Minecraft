@@ -16,17 +16,19 @@ parameters:
   - name: GitHubBranch
     default: ''
   - name: CreateRelease
-    default: false
+    default:
+  - name: SourcesDirectory
+    default:
+  - name: TempDirectory
+    default:
   - name: StageName
     default: staging
-  - name: PushToGithub
-    default: true
 stages:
   - stage: staging
     displayName: "Staging"
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      - template: ../jobs/deploy-to-server.yml
+      - template: ../jobs/deploy-to-server-lower-env.yml
         parameters:
           ServerID: ${{ parameters.ServerID }}
           PterodactylAddress: ${{ parameters.PterodactylAddress }}
@@ -40,7 +42,6 @@ stages:
           GitHubSourceBranch: staging
           GitHubDestinationBranch: main
           ModpackVersion: ${{ parameters.ModpackVersion }}
-          PushToGithub: ${{ parameters.PushToGithub }}
 
       - template: ../jobs/create-github-release.yml
         parameters:
