@@ -44,6 +44,7 @@ stages:
       ModpackAuthor: ${{ parameters.ModpackAuthor }}
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
+      PushToGithub: ${{ parameters.PushToGithub }}
 
   - template: ../stages/dev-stage.yml
     parameters:
@@ -54,6 +55,7 @@ stages:
       PipelineWorkspace: $(Pipeline.Workspace)
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
+      PushToGithub: ${{ parameters.PushToGithub }}
       CreatePrerelease: ${{ parameters.CreatePrerelease }}
 
   - template: ../stages/staging-stage.yml
@@ -65,6 +67,7 @@ stages:
       PipelineWorkspace: $(Pipeline.Workspace)
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
+      PushToGithub: ${{ parameters.PushToGithub }}
       CreateRelease: ${{ parameters.CreateRelease }}
 
   - template: ../stages/prod-stage.yml
