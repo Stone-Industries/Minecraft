@@ -13,14 +13,8 @@ parameters:
     default: ''
   - name: GitHubRepo
     default: ''
-  - name: SourcesDirectory
-    default:
-  - name: BinariesDirectory
-    default:
-  - name: ArtifactDirectory
-    default:
-  - name: TempDirectory
-    default:
+  - name: PushToGithub
+    default: true
 stages:
   - stage: build_server
     displayName: "Build and Package Server"
@@ -32,16 +26,12 @@ stages:
         ForgeVersion: ${{ parameters.ForgeVersion }}
         ModpackName: ${{ parameters.ModpackName }}
         ModpackAuthor: ${{ parameters.ModpackAuthor }}
-        ModListPath: ${{ parameters.SourcesDirectory }}\modlist-server.csv
+        ModListPath: $(Build.SourcesDirectory)\modlist-server.csv
         ManifestType: server
-        OutputLocation: ${{ parameters.BinariesDirectory }}\server
-        SourcesDirectory: ${{ parameters.SourcesDirectory }}
-        BinariesDirectory: ${{ parameters.BinariesDirectory }}
-        ArtifactDirectory: ${{ parameters.ArtifactDirectory }}
+        OutputLocation: $(Build.BinariesDirectory)\server
 
     - template: ../jobs/push-to-github.yml
       parameters:
         GitHubOrg: ${{ parameters.GitHubOrg }}
         GitHubRepo: ${{ parameters.GitHubRepo }}
-        SourcesDirectory: ${{ parameters.SourcesDirectory }}
-        TempDirectory: ${{ parameters.TempDirectory }}
+        PushToGithub: ${{ parameters.PushToGithub }}

@@ -17,20 +17,14 @@ parameters:
     default: ''
   - name: PterodactylAddress
     default: ''
+  - name: PushToGithub
+    default: true
   - name: CreatePrerelease
     default: false
   - name: CreateRelease
     default: false
   - name: isProdDeployment
     default: false
-  - name: SourcesDirectory
-    default: ''
-  - name: BinariesDirectory
-    default: ''
-  - name: ArtifactDirectory
-    default: ''
-  - name: PipelineWorkspace
-    default: ''
 
 stages:
   - template: ../stages/build-client-stage.yml
@@ -40,9 +34,6 @@ stages:
       ForgeVersion: ${{ parameters.ForgeVersion }}
       ModpackName: ${{ parameters.ModpackName }}
       ModpackAuthor: ${{ parameters.ModpackAuthor }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      BinariesDirectory: $(Build.BinariesDirectory)
-      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
   
   - template: ../stages/build-server-stage.yml
     parameters:
@@ -53,10 +44,6 @@ stages:
       ModpackAuthor: ${{ parameters.ModpackAuthor }}
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      BinariesDirectory: $(Build.BinariesDirectory)
-      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
-      TempDirectory: $(Agent.TempDirectory)
 
   - template: ../stages/dev-stage.yml
     parameters:
@@ -67,10 +54,7 @@ stages:
       PipelineWorkspace: $(Pipeline.Workspace)
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      TempDirectory: $(Agent.TempDirectory)
       CreatePrerelease: ${{ parameters.CreatePrerelease }}
-      ReleaseNotes: ${{ parameters.ReleaseNotes }}
 
   - template: ../stages/staging-stage.yml
     parameters:
@@ -81,10 +65,7 @@ stages:
       PipelineWorkspace: $(Pipeline.Workspace)
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      TempDirectory: $(Agent.TempDirectory)
       CreateRelease: ${{ parameters.CreateRelease }}
-      ReleaseNotes: ${{ parameters.ReleaseNotes }}
 
   - template: ../stages/prod-stage.yml
     parameters:
