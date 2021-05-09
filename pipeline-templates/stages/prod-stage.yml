@@ -3,9 +3,8 @@ parameters:
     default: ''
   - name: PterodactylAddress
     default: ''
-  - name: PipelineWorkspace
-    default: ''
   - name: isProdDeployment
+    default: false
   - name: StageName
     default: Prod
 stages:
@@ -13,9 +12,8 @@ stages:
     displayName: "prod"
     condition: and(succeeded(), eq(${{ parameters.isProdDeployment }}, 'true'))
     jobs:
-      - template: ../jobs/deploy-to-server-lower-env.yml
+      - template: ../jobs/deploy-to-server.yml
         parameters:
           ServerID: ${{ parameters.ServerID }}
           PterodactylAddress: ${{ parameters.PterodactylAddress }}
-          PipelineWorkspace: ${{ parameters.PipelineWorkspace }}
           StageName: ${{ parameters.StageName }}

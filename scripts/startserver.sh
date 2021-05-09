@@ -93,14 +93,14 @@ function download_serverstart_jar {
   which wget >> /dev/null
   if [ $? -eq 0 ]; then
     echo "[+] Using wget to download serverstarter.jar..."
-    wget -O serverstarter-2.0.1.jar "${URL}"
+    wget -O serverstarter-2.0.1.jar "https://github.com/AllTheMods/alltheservers/releases/download/2.0.1/serverstarter-2.0.1.jar"
     return 0
   fi
 
   which curl >> /dev/null
   if [ $? -eq 0 ]; then
     echo "[+] Using curl to download serverstarter.jar..."
-    curl -o serverstarter-2.0.1.jar "${URL}"
+    curl -o serverstarter-2.0.1.jar "https://github.com/AllTheMods/alltheservers/releases/download/2.0.1/serverstarter-2.0.1.jar"
     return 0
   fi
 
@@ -114,12 +114,6 @@ function download_serverstart_jar {
 #mount_ramdisk
 #load_ramdisk
 run_server
-
-# Check for a crash, restart once.
-if [ ! $? -eq 0 ]; then
-  echo "[!] Crash detected, restarting server once!"
-  run_server
-fi
 
 # Copy back the changes.
 #unload_ramdisk

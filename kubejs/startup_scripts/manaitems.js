@@ -1,7 +1,7 @@
 // priority: 0
 
 // Worldgen //
-
+onEvent('worldgen.add', event => {
 	event.addOre(ore => {
 	  ore.block = 'kubejs:mana_ore' // Block ID (Use [] syntax for properties)
 	  ore.spawnsIn.blacklist = false // Inverts spawn whitelist
@@ -40,4 +40,5 @@ onEvent('block.registry', event => {
 	event.create('activated_mana_ore').material('rock').hardness(25.0).displayName('Activated Mana Ore')
 	// Register new blocks here
 	// event.create('example_block').material('wood').hardness(1.0).displayName('Example Block')
+})
 })

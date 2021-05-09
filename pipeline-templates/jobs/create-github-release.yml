@@ -13,10 +13,10 @@ parameters:
     default: false
   - name: CreateRelease
     default: false
-  - name: TempDirectory
-    default: ''
+
 jobs:
   - deployment: createrelease
+    displayName: Create GitHub Release
     dependsOn: performpr
     condition: |
       or(
@@ -40,7 +40,6 @@ jobs:
         runOnce:
           deploy:
               steps:
-                - checkout: self
                 - powershell: |
                     $env:GIT_REDIRECT_STDERR = '2>&1'
                     $RepoURL = "https://Cadacious:$env:PERSONALACCESSTOKEN@github.com/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}"
