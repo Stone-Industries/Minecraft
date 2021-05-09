@@ -40,6 +40,7 @@ jobs:
         runOnce:
           deploy:
               steps:
+                - checkout: self
                 - powershell: |
                     $env:GIT_REDIRECT_STDERR = '2>&1'
                     $RepoURL = "https://Cadacious:$env:PERSONALACCESSTOKEN@github.com/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}"
