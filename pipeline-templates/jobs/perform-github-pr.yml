@@ -9,8 +9,26 @@ parameters:
     default: ''
   - name: ModpackVersion
     default: ''
+  - name: PushToGithub
+    default: ''
+
 jobs:
   - deployment: performpr
+    condition: |
+      and(
+        and(
+          succeeded(), 
+          eq(
+            '${{ parameters.PushToGithub }}', true
+          )
+        ),
+        and(
+          succeeded(), 
+          ne(
+            stageDependencies.A.pushtogit.outputs['pushtodev.skippr'], 'true'
+          )
+        )
+      )
     dependsOn: deployserver
     environment: StoneIndustries-${{ variables.System.StageName }}
     displayName: "Pull Request to ${{ parameters.GitHubDestinationBranch }}"
@@ -25,7 +43,7 @@ jobs:
                 inputs:
                   repoType: 'GitHub'
                   githubEndpoint: 'github.com_Cadacious'
-                  githubRepository: 'Stone-Industries/Minecraft'
+                  githubRepository: '${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}'
                   sourceBranch: '${{ parameters.GitHubSourceBranch }}'
                   targetBranch: '${{ parameters.GitHubDestinationBranch }}'
                   title: 'Stone Industries (${{ parameters.ModpackVersion }})'

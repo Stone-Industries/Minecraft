@@ -3,14 +3,24 @@ parameters:
     default: ''
   - name: GitHubRepo
     default: ''
-  - name: SourcesDirectory
+  - name: CommitMessage
     default: ''
-  - name: TempDirectory
-    default: ''
-
+  - name: PushToGithub
+    default: false
 jobs:
   - deployment: pushtogit
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    condition: |
+      and(
+        succeeded(), 
+        and(
+          ne(
+            variables['Build.Reason'], 'PullRequest'
+          ),
+          eq(
+            ${{ parameters.PushToGithub }}, 'true'
+          )
+        )
+      )
     dependsOn: buildandpackage
     environment: StoneIndustries-${{ Variables.System.StageName }}
     displayName: "Push to GitHub"
@@ -25,24 +35,35 @@ jobs:
               $env:GIT_REDIRECT_STDERR = '2>&1'
               $RepoURL = "https://Cadacious:$env:PERSONALACCESSTOKEN@github.com/${{ parameters.GitHubOrg }}/${{ parameters.GitHubRepo }}"
 
-              Set-Location ${{ parameters.TempDirectory }}
-              Remove-Item ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }} -recurse -force -erroraction silentlycontinue
+              Set-Location $(Agent.TempDirectory)
+              Remove-Item $(Agent.TempDirectory)\${{ parameters.GitHubRepo }} -recurse -force -erroraction silentlycontinue
               git config --global user.name "Azure-Pipelines"
               git config --global user.email "Azure-Pipelines@SandboxServers.games"
               
               git clone --branch dev $RepoURL
 
-              Set-Location ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }}
+              Set-Location $(Agent.TempDirectory)\${{ parameters.GitHubRepo }}
 
-              Remove-Item ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }}\* -Recurse
+              Remove-Item $(Agent.TempDirectory)\${{ parameters.GitHubRepo }}\* -Recurse
 
-              Copy-Item -Path ${{ parameters.SourcesDirectory }}\* -Destination ${{ parameters.TempDirectory }}\${{ parameters.GitHubRepo }}\ -recurse
+              Copy-Item -Path $(Build.SourcesDirectory)\* -Destination $(Agent.TempDirectory)\${{ parameters.GitHubRepo }}\ -recurse
 
               git add --all
-              git commit -m "Merging to GitHub Dev branch from Azure DevOps after successful build"
-              git push origin dev
 
-              $env:PERSONALACCESSTOKEN | out-file ${{ parameters.TempDirectory }}\token.txt
+              $Commit = git commit -m "${{ parameters.CommitMessage }}"
+              $PushNeeded = (($Commit -like "*nothing to commit, working tree clean").count -eq 0)
+
+              If($PushNeeded){
+                $Commit
+                git push origin dev
+              }
+              else{
+                Write-Host "Setting variable to skip PR as no changes were detected on the dev branch of GitHub."
+                write-host "##vso[task.setvariable variable=SkipPR;isOutput=true]true"
+              }
+
+              $env:PERSONALACCESSTOKEN | out-file $(Agent.TempDirectory)\token.txt
             displayName: 
+            name: pushtodev
             env:
               PersonalAccessToken: $(Git-Token)
