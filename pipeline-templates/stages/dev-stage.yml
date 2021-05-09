@@ -7,30 +7,26 @@ parameters:
     default: ''
   - name: PterodactylAddress
     default: ''
-  - name: PipelineWorkspace
-    default: ''
   - name: GitHubOrg
     default: ''
   - name: GitHubRepo
     default: ''
   - name: CreatePrerelease
     default: false
-  - name: SourcesDirectory
-    default: ''
-  - name: TempDirectory
-    default: ''
+  - name: PushToGithub
+    default: false
   - name: StageName
     default: dev
+
 stages:
   - stage: dev
     displayName: "Dev"
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      - template: ../jobs/deploy-to-server-lower-env.yml
+      - template: ../jobs/deploy-to-server.yml
         parameters:
           ServerID: ${{ parameters.ServerID }}
           PterodactylAddress: ${{ parameters.PterodactylAddress }}
-          PipelineWorkspace: ${{ parameters.PipelineWorkspace }}
           StageName: ${{ parameters.StageName }}
 
       - template: ../jobs/perform-github-pr.yml
@@ -40,6 +36,7 @@ stages:
           GitHubSourceBranch: dev
           GitHubDestinationBranch: staging
           ModpackVersion: ${{ parameters.ModpackVersion }}
+          PushToGithub: ${{ parameters.PushToGithub }}
 
       - template: ../jobs/create-github-release.yml
         parameters:

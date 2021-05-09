@@ -13,22 +13,18 @@ parameters:
     default: ''
   - name: GitHubRepo
     default: ''
+  - name: CommitMessage
+    default: ''
   - name: PterodactylAddress
     default: ''
+  - name: PushToGithub
+    default: false
   - name: CreatePrerelease
     default: false
   - name: CreateRelease
     default: false
   - name: isProdDeployment
     default: false
-  - name: SourcesDirectory
-    default: ''
-  - name: BinariesDirectory
-    default: ''
-  - name: ArtifactDirectory
-    default: ''
-  - name: PipelineWorkspace
-    default: ''
 
 stages:
   - template: ../stages/build-client-stage.yml
@@ -38,9 +34,6 @@ stages:
       ForgeVersion: ${{ parameters.ForgeVersion }}
       ModpackName: ${{ parameters.ModpackName }}
       ModpackAuthor: ${{ parameters.ModpackAuthor }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      BinariesDirectory: $(Build.BinariesDirectory)
-      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
   
   - template: ../stages/build-server-stage.yml
     parameters:
@@ -51,10 +44,8 @@ stages:
       ModpackAuthor: ${{ parameters.ModpackAuthor }}
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      BinariesDirectory: $(Build.BinariesDirectory)
-      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
-      TempDirectory: $(Agent.TempDirectory)
+      CommitMessage: ${{ parameters.CommitMessage }}
+      PushToGithub: ${{ parameters.PushToGithub }}
 
   - template: ../stages/dev-stage.yml
     parameters:
@@ -62,11 +53,9 @@ stages:
       ModpackName: ${{ parameters.ModpackName }}
       ServerID: $(DevServerID)
       PterodactylAddress: ${{ parameters.PterodactylAddress }}
-      PipelineWorkspace: $(Pipeline.Workspace)
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      TempDirectory: $(Agent.TempDirectory)
+      PushToGithub: ${{ parameters.PushToGithub }}
       CreatePrerelease: ${{ parameters.CreatePrerelease }}
 
   - template: ../stages/staging-stage.yml
@@ -75,16 +64,13 @@ stages:
       ModpackName: ${{ parameters.ModpackName }}
       ServerID: $(StagingServerID)
       PterodactylAddress: ${{ parameters.PterodactylAddress }}
-      PipelineWorkspace: $(Pipeline.Workspace)
       GitHubOrg: ${{ parameters.GitHubOrg }}
       GitHubRepo: ${{ parameters.GitHubRepo }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      TempDirectory: $(Agent.TempDirectory)
+      PushToGithub: ${{ parameters.PushToGithub }}
       CreateRelease: ${{ parameters.CreateRelease }}
 
   - template: ../stages/prod-stage.yml
     parameters:
       ServerID: $(ProdServerID)
       PterodactylAddress: ${{ parameters.PterodactylAddress }}
-      PipelineWorkspace: $(Pipeline.Workspace)
       isProdDeployment: ${{ parameters.isProdDeployment }}

@@ -22,7 +22,7 @@ Function New-ModpackManifest{
     Begin{
         Try{
             #Import from location provided by caller
-            $ModList = Import-CSV $ModListPath | Where -FilterScript {($PSItem.side -eq "Both") -and ($PSItem.side -eq "$ManifestType")}
+            $ModList = Import-CSV $ModListPath | Where -FilterScript {($PSItem.side -eq "Both") -or ($PSItem.side -eq "$ManifestType")}
         }
         Catch{
             Write-Warning "Could not import mod list from location $ModListPath, aborting execution." -WarningAction Stop

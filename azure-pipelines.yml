@@ -11,38 +11,18 @@ name: $(Build.DefinitionName)-$(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
 #           - dev
 
 parameters:
-  - name: MinecraftVersion
-    displayName: Minecraft Version
-    type: string
-    default: 1.16.5
-  - name: ModpackName
-    displayName: Modpack Name
-    type: string
-    default: Stone Industries
-  - name: ModpackAuthor
-    displayName: Modpack Author
-    type: string
-    default: Stone Industries Team
   - name: ModpackVersion
     displayName: Modpack Version
     type: string
     default: 0.0.3
-  - name: ForgeVersion
-    displayName: Forge Version
+  - name: CommitMessage
+    displayName: GitHub Commit Message
     type: string
-    default: 36.1.2
-  - name: GitHubOrg
-    displayName: GitHub Organization
-    type: string
-    default: 'Stone-Industries'
-  - name: GitHubRepo
-    displayName: GitHub Repo
-    type: string
-    default: 'Minecraft'
-  - name: PterodactylAddress
-    displayName: Pterodactyl Address
-    type: string
-    default: 'https://pterodactyl.sandboxservers.games'
+    default: 'Pushing to GitHub after successful build via Azure Pipelines'
+  - name: PushToGithub
+    displayName: Push To Github
+    type: boolean
+    default: false
   - name: CreatePrerelease
     displayName: Create Prerelease
     type: boolean
@@ -74,21 +54,19 @@ trigger:
 pool:
   name: Sandbox Servers Agents
 
-stages:
-  - template: pipeline-templates/pipelines/modpack-pipeline.yml
-    parameters:
-      MinecraftVersion: ${{ parameters.MinecraftVersion }}
-      ModpackVersion: ${{ parameters.ModpackVersion }}
-      ForgeVersion: ${{ parameters.ForgeVersion }}
-      ModpackName: ${{ parameters.ModpackName }}
-      ModpackAuthor: ${{ parameters.ModpackAuthor }}
-      PterodactylAddress: ${{ parameters.PterodactylAddress }}
-      GitHubOrg: ${{ parameters.GitHubOrg }}
-      GitHubRepo: ${{ parameters.GitHubRepo }}
-      CreatePrerelease: ${{ parameters.CreatePrerelease }}
-      CreateRelease: ${{ parameters.CreateRelease }}
-      isProdDeployment: ${{ parameters.isProdDeployment }}
-      SourcesDirectory: $(Build.SourcesDirectory)
-      BinariesDirectory: $(Build.BinariesDirectory)
-      ArtifactDirectory: $(Build.ArtifactStagingDirectory)
-      PipelineWorkspace: $(Pipeline.Workspace)
+extends:
+  template: pipeline-templates/pipelines/modpack-pipeline.yml
+  parameters:
+    MinecraftVersion: $(MinecraftVersion)
+    ModpackVersion: ${{ parameters.ModpackVersion }}
+    ForgeVersion: $(ForgeVersion)
+    ModpackName: $(ModpackName)
+    ModpackAuthor: $(ModpackAuthor)
+    PterodactylAddress: $(PterodactylAddress)
+    GitHubOrg: $(GitHubOrg)
+    GitHubRepo: $(GitHubRepo)
+    CommitMessage: ${{ parameters.CommitMessage }}
+    CreatePrerelease: ${{ parameters.CreatePrerelease }}
+    CreateRelease: ${{ parameters.CreateRelease }}
+    isProdDeployment: ${{ parameters.isProdDeployment }}
+    PushToGithub: ${{ parameters.PushToGithub }}

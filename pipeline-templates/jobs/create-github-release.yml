@@ -13,10 +13,10 @@ parameters:
     default: false
   - name: CreateRelease
     default: false
-  - name: TempDirectory
-    default: ''
+
 jobs:
   - deployment: createrelease
+    displayName: Create GitHub Release
     dependsOn: performpr
     condition: |
       or(
