@@ -1,7 +1,7 @@
 // priority: 0
 
 // Worldgen //
-
+onEvent('worldgen.add', event => {
 	event.addOre(ore => {
 	  ore.block = 'kubejs:mana_ore' // Block ID (Use [] syntax for properties)
 	  ore.spawnsIn.blacklist = false // Inverts spawn whitelist
