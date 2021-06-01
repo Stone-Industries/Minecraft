@@ -14,7 +14,7 @@ parameters:
   - name: ModpackVersion
     displayName: Modpack Version
     type: string
-    default: 0.0.3
+    default: 0.0.5
   - name: CommitMessage
     displayName: GitHub Commit Message
     type: string

@@ -1,0 +1,15 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+       "top": "nuclearsciences:blocks/vaporizer_top",
+       "bottom": "nuclearsciences:blocks/vaporizer_bottom",
+       "side": "nuclearsciences:blocks/vaporizer_side"
+    },
+    "model": "nuclearsciences:topsidebottomblock"
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+       "top": "nuclearsciences:blocks/condensor_top",
+       "bottom": "nuclearsciences:blocks/condensor_bottom",
+       "side": "nuclearsciences:blocks/condensor_side"
+    },
+    "model": "nuclearsciences:topsidebottomblock"
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}

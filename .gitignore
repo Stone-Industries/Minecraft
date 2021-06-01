@@ -14,3 +14,5 @@ mods/
 config/worldedit/.archive-unpack/
 
 config/worldedit/sessions/
+
+kubejs/exported/

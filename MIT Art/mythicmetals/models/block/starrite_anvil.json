@@ -1,0 +1,7 @@
+{
+  "parent": "mythicmetals:block/anvil_base",
+  "textures": {
+    "body": "mythicmetals:blocks/starrite_anvil",
+    "particle": "mythicmetals:blocks/starrite_block"
+  }
+}
