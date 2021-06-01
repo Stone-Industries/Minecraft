@@ -1,0 +1,10 @@
+
+[general]
+	#The material blacklist of this module.
+	materialBlacklist = [
+		"silicon",
+		"sawdust",
+		"obsidian",
+		"sulfur"
+	]
+

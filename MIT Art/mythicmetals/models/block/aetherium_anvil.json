@@ -1,0 +1,7 @@
+{
+  "parent": "mythicmetals:block/anvil_base",
+  "textures": {
+    "body": "mythicmetals:blocks/aetherium_anvil",
+    "particle": "mythicmetals:blocks/aetherium_block"
+  }
+}

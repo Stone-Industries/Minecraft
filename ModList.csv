@@ -52,6 +52,7 @@ GameStages,1.16.5-7.1.2,268655,Both,Dependencies,https://www.curseforge.com/mine
 Hwyla-forge,1.10.11-B78_1.16.2,253449,Both,Game Utilities,https://www.curseforge.com/minecraft/mc-mods/hwyla
 iceandfire,2.1.6-1.16.4,264231,Both,Content,https://www.curseforge.com/minecraft/mc-mods/ice-and-fire-dragons
 Industrial Agriculture,1.16.3-1.7.1,356483,Both,Content,https://www.curseforge.com/minecraft/mc-mods/industrial-agriculture
+industrial-foregoing,1.16.5-3.2.11-55cb112,266515,Both,https://www.curseforge.com/minecraft/mc-mods/industrial-foregoing
 infernal-expansion-forge,1.3,395078,Both,Content,https://www.curseforge.com/minecraft/mc-mods/infernal-expansion
 invtweaks,1.16.4-1.0.1,383070,Both,Game Utilities,https://www.curseforge.com/minecraft/mc-mods/inventory-tweaks-renewed
 ironchest,1.16.4-11.2.10,228756,Both,Game Utilities,https://www.curseforge.com/minecraft/mc-mods/iron-chests
@@ -60,8 +61,12 @@ jei-professions,1.0.0-1.16.4,403499,Both,Dependencies,https://www.curseforge.com
 jeiintegration,1.16.5-7.0.1.15,265917,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/jei-integration
 JAOPCA,1.16.5-3.4.0.8,266936,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/jaopca
 JustEnoughResources,1.16.3-0.12.0.100,240630,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/just-enough-resources-jer
-konkrete,1.1.6_MC_1.16.2-1.16.5,410295,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/konkrete
+konkrete,1.1.6_MC_1.16.2-1.16.5,410295,Client,Dependencies,https://www.curseforge.com/minecraft/mc-mods/konkrete
 kubejs,1605.3.7-build.186-forge,238086,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/kubejs-forge
+kubejs-mekanism,1604.1.1.6,418651,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/kubejs-mekanism
+kubejs-blood-magic,1604.1.0.4,428277,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/kubejs-blood-magic
+kubejs-create,1604.1.0.4,429371,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/kubejs-create
+MekaJS,1.1.0,397330,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/mekajs
 LibX,1.16.3-1.0.60,412525,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/libx
 Lollipop,1.16.5-3.2.9,347954,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/lollipop
 Mekanism,1.16.5-10.0.21.448,268560,Both,Tech,https://www.curseforge.com/minecraft/mc-mods/mekanism
@@ -78,7 +83,7 @@ pamhc2foodcore,1.16.3-1.0.2,372534,Both,Dependencies,https://www.curseforge.com/
 pamhc2trees,1.16.3-1.0.1,365460,Both,Content,https://www.curseforge.com/minecraft/mc-mods/pams-harvestcraft-2-trees
 Patchouli,1.16.4-50,306770,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/patchouli
 pipez,1.16.5-1.1.5,443900,Both,Tech,https://www.curseforge.com/minecraft/mc-mods/pipez
-Placebo,1.16.4-4.4.2,283644,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/placebo
+Placebo,1.16.4-4.4.5,283644,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/placebo
 pneumaticcraft-repressurized,1.16.5-2.11.4-170,281849,Both,Tech,https://www.curseforge.com/minecraft/mc-mods/pneumaticcraft-repressurized
 polymorph-forge,1.16.5-0.24,388800,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/polymorph
 Powah,1.16.5-2.3.16,352656,Both,Tech,https://www.curseforge.com/minecraft/mc-mods/powah
@@ -95,6 +100,7 @@ SimplyJetpacks2,1.16.5-2.6.7.1,251792,Both,Content,https://www.curseforge.com/mi
 spark-forge,1.5.2,361579,Both,Other Utilities,https://www.curseforge.com/minecraft/mc-mods/spark
 supermartijn642corelib,1.0.3-mc1.16.5,454372,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/supermartijn642s-core-lib
 swingthroughgrass,1.16.4-1.5.3,264353,Both,Other Utilities,https://www.curseforge.com/minecraft/mc-mods/swingthroughgrass
+titanium,1.16.5-3.2.8.2,287342,Both,Dependencies,https://www.curseforge.com/minecraft/mc-mods/titanium
 Toast-Control,1.16.4-4.3.1,271740,Both,Game Utilities,https://www.curseforge.com/minecraft/mc-mods/toast-control
 tombstone,1.16-6.3.3,243707,Both,Game Utilities,https://www.curseforge.com/minecraft/mc-mods/corail-tombstone
 topography,1.14.3,297878,Both,Game Utilities,https://www.curseforge.com/minecraft/mc-mods/topography

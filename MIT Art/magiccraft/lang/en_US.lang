@@ -1,0 +1,64 @@
+item.bloodyManaOrb.name=Bloody Mana Orb
+item.creativeManaOrb.name=Creative Mana Orb
+item.manaInterpreter.name=Mana Interpreter
+item.manaUpgrader.name=Mana Upgrader
+item.lunarInterpreter.name=Lunar Interpreter
+item.temporalInterpreter.name=Temporal Interpreter
+item.solarForce.name=Solar Force
+item.lunarForce.name=Lunar Force
+item.atmosphericForce.name=Atmospheric Force
+item.runicContainer.name=Runic Container
+item.basicManaContainer.name=Basic Mana Container
+item.magicFeather.name=Magic Feather
+item.bedStone.name=Bed Stone
+item.mysticalHand.name=Mystical Hand
+item.hellCharm.name=Hell Charm
+item.evilApple.name=Apple
+item.foreverFruit.name=Forever Fruit
+item.spectralCage.name=Spectral Cage
+
+item.helmetRed.name=Red Helmet
+item.helmetBlue.name=Blue Helmet
+item.helmetPurple.name=Purple Helmet
+item.helmetGray.name=Gray Helmet
+item.helmetPink.name=Magic Sparkley Unicorn Helmet
+
+item.rune-white.name=White Rune
+item.rune-orange.name=Orange Rune
+item.rune-magenta.name=Magenta Rune
+item.rune-light_blue.name=Light Blue Rune
+item.rune-yellow.name=Yellow Rune
+item.rune-lime.name=Lime Rune
+item.rune-pink.name=Pink Rune
+item.rune-gray.name=Gray Rune
+item.rune-light_gray.name=Light Gray Rune
+item.rune-cyan.name=Cyan Rune
+item.rune-purple.name=Purple Rune
+item.rune-blue.name=Blue Rune
+item.rune-brown.name=Brown Rune
+item.rune-green.name=Green Rune
+item.rune-red.name=Red Rune
+item.rune-black.name=Black Rune
+item.rune-blank.name=Blank Rune
+
+tile.blackStone.Blackstone.name=Blackstone
+tile.blackStone.Cobble.name=Blackstone Cobble
+tile.blackStone.Smooth.name=Smooth Blackstone
+tile.blackStone.Brick.name=Blackstone Bricks
+tile.blackStone.Ornate.name=Ornate Blackstone
+tile.blackStone.Pillar.name=Blackstone Pillar
+tile.blackStone.Chiseled.name=Chiseled Blackstone
+
+tile.lightStone.Lightstone.name=Lightstone
+tile.lightStone.Cobble.name=Lightstone Cobble
+tile.lightStone.Smooth.name=Smooth Lightstone
+tile.lightStone.Brick.name=Lightstone Bricks
+tile.lightStone.Ornate.name=Ornate Lightstone
+tile.lightStone.Pillar.name=Lightstone Pillar
+tile.lightStone.Chiseled.name=Chiseled Lightstone
+
+tile.chalk.name=Chalk Block
+tile.alchemicalCircle.name=Alchemical Circle
+tile.crystalBall.name=Crystal Ball
+
+itemGroup.tabMagicCraft=Magic Craft

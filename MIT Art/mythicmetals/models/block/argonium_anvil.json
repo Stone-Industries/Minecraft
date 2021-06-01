@@ -1,0 +1,7 @@
+{
+  "parent": "mythicmetals:block/anvil_base",
+  "textures": {
+    "body": "mythicmetals:blocks/argonium_anvil",
+    "particle": "mythicmetals:blocks/argonium_block"
+  }
+}
