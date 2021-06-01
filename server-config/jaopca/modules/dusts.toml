@@ -1,0 +1,9 @@
+
+[general]
+	#The material blacklist of this module.
+	materialBlacklist = [
+		"wood"
+	]
+	#The materials to force generate passive forms for this module.
+	passiveMaterialWhitelist = []
+

@@ -1,0 +1,87 @@
+tile.orePlasma.plutonium.name=Plutonium Ore
+tile.orePlasma.radionite.name=Radionite Ore
+tile.orePlasma.neptunium.name=Neptunium Ore
+tile.orePlasma.obsidium.name=Obsidium Ore
+tile.orePlasma.uranium.name=Uranium Ore
+tile.orePlasma.lead.name=Lead Ore
+
+tile.acid.name=Acid
+tile.cryonite.name=Cryonite
+tile.neptunium.name=Neptunium
+tile.netherflow.name=Netherflow
+tile.obsidium.name=Obsidium
+tile.plutonium.name=Plutonium
+tile.radionite.name=Radionite
+tile.uranium.name=Uranium
+
+tile.glowCloth.acid.name=Acid Glowcloth
+tile.glowCloth.radionite.name=Radionite Glowcloth
+tile.glowCloth.netherflow.name=Netherflow Glowcloth
+tile.glowCloth.neptunium.name=Neptunium Glowcloth
+tile.glowCloth.uranium.name=Uranium Glowcloth
+tile.glowCloth.plutonium.name=Plutonium Glowcloth
+tile.glowCloth.cryonite.name=Cryonite Glowcloth
+tile.glowCloth.obsidium.name=Obsidium Glowcloth
+
+tile.reinforcedGlass.name=Reinforced Glass
+tile.acidBarrier.name=Acid Barrier
+tile.frozenCryonite.name=Frozen Cryonite
+tile.acidTnt.name=Acid TNT
+
+item.pc-goop.0.name=Acid Goop
+item.pc-goop.1.name=Cryonite Goop
+item.pc-goop.2.name=Neptunium Goop
+item.pc-goop.3.name=Netherflow Goop
+item.pc-goop.4.name=Obsidium Goop
+item.pc-goop.5.name=Plutonium Goop
+item.pc-goop.6.name=Radionite Goop
+item.pc-goop.7.name=Uranium Goop
+
+item.pc-ingot.0.name=Cryonite Ingot
+item.pc-ingot.1.name=Lead Ingot
+item.pc-ingot.2.name=Neptunium Ingot
+item.pc-ingot.3.name=Netherflow Ingot
+item.pc-ingot.4.name=Obsidium Ingot
+item.pc-ingot.5.name=Plutonium Ingot
+item.pc-ingot.6.name=Radionite Ingot
+item.pc-ingot.7.name=Uranium Ingot
+
+item.plasma.name=Plasma
+item.pc-battery.0.name=Empty Battery
+item.pc-battery.1.name=Charged Caustic Battery
+item.pc-battery.2.name=Cryonite Battery
+item.pc-battery.3.name=Plasma Battery
+item.pc-battery.4.name=Overcharged Caustic Battery
+item.energyCell.name=Energy Cell
+item.thermopellet.name=Thermopellet
+
+item.pc-vial.0.name=Empty Vial
+item.pc-vial.1.name=Acid Vial
+item.pc-vial.2.name=Cryonite Vial
+item.pc-vial.3.name=Neptunium Vial
+item.pc-vial.4.name=Netherflow Vial
+item.pc-vial.5.name=Obsidium Vial
+item.pc-vial.6.name=Plutonium Vial
+item.pc-vial.7.name=Radionite Vial
+item.pc-vial.8.name=Uranium Vial
+
+item.beamSplitter.name=Beam Splitter
+item.acidGun.name=Acid Launcher
+item.cryoBlaster.name=Cryo Blaster
+item.laserShotgun.name=Laser Shotgun
+item.laserGun.name=Laser Rifle
+item.laserGunSplit.name=Split Beam Laser Rifle
+item.plasmaGun.name=Plasma Rifle
+item.plasmaGunSplit.name=Split Beam Plasma Rifle
+item.railGun.name=Railgun
+
+item.acidGrenade.name=Acid Grenade
+item.hazmatBoots.name=Hazmat Boots
+item.hazmatHood.name=Hazmat Hood
+item.hazmatJacket.name=Hazmat Jacket
+item.hazmatPants.name=Hazmat Pants
+
+item.causticBoat.name=Caustic Boat
+item.plasmaLeather.name=Plasma Leather
+
+itemGroup.PlasmaCraft=PlasmaCraft
